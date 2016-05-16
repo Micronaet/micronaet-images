@@ -45,8 +45,6 @@ class ProductImageCategory(orm.Model):
     _description = 'Image category'
     
     _columns = {
-        'code': fields.char('Code', size=10, required=True, 
-            help='Used for setup configuration parameters'),
         'name': fields.char('Name', size=64, required=True),
         'path': fields.char('Folder path', size=128, required=True,
             help='Path folder, ex.: /home/admin/photo'),

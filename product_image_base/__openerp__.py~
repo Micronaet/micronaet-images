@@ -36,6 +36,8 @@
     'data': [
         'security/ir.model.access.csv',    
         'image_base_view.xml',
+        
+        'data/config_data.xml',
         ],
     'active': False,
     'installable': True,
