@@ -50,8 +50,8 @@ class ProductImageCategory(orm.Model):
         'name': fields.char('Name', size=64, required=True),
         'path': fields.char('Folder path', size=128, required=True,
             help='Path folder, ex.: /home/admin/photo'),
-        'parent_format': fields.char('Parent format', size=60
-            help='Parent code list for product composition, ex.: [3, 5]'),
+        'parent_format': fields.char('Parent format', size=60,
+            help='Parent code list for product composition, ex.: 3|5'),
         'extension_image': fields.char(
             'Extension', size=10, required=True,
             help="without dot, for ex.: jpg"
@@ -115,7 +115,7 @@ class ProductProductImage(osv.osv):
             parent_block = [len(code)]
             try:
                 if category_proxy.parent_format:
-                    parent_block.extend(eval(category_proxy.parent_format))
+                    parent_block.extend(category_proxy.parent_format.split('|'))
                 parent_block = parent_block.sort().reverse()
             except:
                 _logger.error('Block element error: use only code')

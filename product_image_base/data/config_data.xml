@@ -16,7 +16,6 @@
              <field name="code">QUOTATION</field>
              <field name="name">Quotation</field>
              <field name="path">~/photo/quotation/company</field>
-             <field name="parent_format">[]</field>             
              <field name="extension_image">jpg</field>
              <field name="empty_image">0.jpg</field>
              <field name="upper_code">1</field>
@@ -26,7 +25,6 @@
              <field name="code">PRODUCT</field>
              <field name="name">Product</field>
              <field name="path">~/photo/product/company</field>
-             <field name="parent_format">[]</field>             
              <field name="extension_image">jpg</field>
              <field name="empty_image">0.jpg</field>
              <field name="upper_code">1</field>
