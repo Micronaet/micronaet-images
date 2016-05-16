@@ -21,6 +21,8 @@ import os
 import sys
 import logging
 import openerp
+import urllib
+import base64
 import openerp.netsvc as netsvc
 import openerp.addons.decimal_precision as dp
 from openerp.osv import fields, osv, expression, orm
@@ -77,7 +79,7 @@ class ProductProductImage(osv.osv):
         ''' Return list of product and image for category_id passed
             context parameters: 
                 only_name: return only name depend if file exist:
-        '''        
+        '''  
         # Read parameters:
         context = context or {}        
         only_name = context.get('only_name', False)
@@ -91,19 +93,18 @@ class ProductProductImage(osv.osv):
         # Read parameter for category passed:
         category_proxy = self.pool.get('product.image.category').browse(
             cr, uid, category_id, context=context)
-        
+
         image_path = os.path.expanduser(category_proxy.path)
         #empty_image = os.path.join(image_path, category_proxy.empty_image)
         if not image_path:
             _logger.error('Path for category: %s not found!' % category_id)
             return res
-        
         for product in self.browse(cr, uid, ids, context=context):            
-            code = product_browse.default_code or ''
+            code = product.default_code or ''
             if not code:
                 _logger.error('Code not found: %s' % product.name)
                 continue
-            
+
             # Prepare code:    
             if category_proxy.upper_code:
                 code = code.upper()
@@ -115,8 +116,10 @@ class ProductProductImage(osv.osv):
             parent_block = [len(code)]
             try:
                 if category_proxy.parent_format:
-                    parent_block.extend(category_proxy.parent_format.split('|'))
-                parent_block = parent_block.sort().reverse()
+                    for item in category_proxy.parent_format.split('|'):
+                        parent_block.append(int(item))
+                parent_block.sort()
+                parent_block.reverse()
             except:
                 _logger.error('Block element error: use only code')
 
@@ -133,6 +136,7 @@ class ProductProductImage(osv.osv):
                     img = base64.encodestring(f.read())
                     f.close()
                 except:
+                    _logger.warning('Image not found: %s' % image)
                     img = False
                 if img:
                     if only_name:
@@ -145,26 +149,45 @@ class ProductProductImage(osv.osv):
     def _get_product_image_quotation(self, cr, uid, ids, field_name, arg, 
             context=None):
         ''' Search category for quotation picture in config and return list:
+            context parameters:
+                'product_image': image code to open, ex.: QUOTATION (default)
         '''
-        # Search parameter: category code for quotation:
-        config_pool = self.pool.get('ir.config_parameter')
-        category_id = False
-        config_ids = config_pool.search(cr, uid, [
-            ('key', '=', 'product.image.quotation')], context=context)
+        context = context or {}
+        # TODO add test for load image or not depend on user setting or report
+            
+        # ----------------------
+        # A. Passed code for image:
+        # ----------------------
+        product_image = context.get('product_image', False)
+        
+        if not product_image:
+            # --------------------
+            # B. Config parameter:
+            # --------------------
+            config_pool = self.pool.get('ir.config_parameter')
+            config_ids = config_pool.search(cr, uid, [
+                ('key', '=', 'product.image.quotation')], context=context)
          
-        # Read value from code:    
-        if config_ids:
-            config_proxy = config_pool.browse(
-                cr, uid, config_ids, context=context)[0]
-            category_ids = self.pool.get('product.image.category').search(
-                cr, uid, [
-                    ('code', '=', config_proxy.value)], context=context)
-            if category_ids:
-                category_id = category_ids[0]    
+            # Read value from code:    
+            if config_ids:
+                config_proxy = config_pool.browse(
+                    cr, uid, config_ids, context=context)[0]
+                product_image = config_proxy.value                
+
+        # -------------------------------
+        # Try to read category if present
+        # (passed or config parameter)
+        # -------------------------------        
+        category_ids = self.pool.get('product.image.category').search(
+            cr, uid, [('code', '=', product_image)], context=context)
+        if category_ids:
+            category_id = category_ids[0]    
+        else:    
+            category_id = False
         
         # Read images from folder:
-        return _get_product_image_list(
-            self, cr, uid, ids, category_id, context=None)    
+        return self._get_product_image_list(
+            cr, uid, ids, category_id, context=None)    
 
     _columns = {
         'product_image_quotation': fields.function(
