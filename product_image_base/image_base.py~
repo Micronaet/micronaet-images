@@ -45,6 +45,8 @@ class ProductImageCategory(orm.Model):
     _description = 'Image category'
     
     _columns = {
+        'code': fields.char('Code', size=10, required=True, 
+            help='Used for setup configuration parameters'),
         'name': fields.char('Name', size=64, required=True),
         'path': fields.char('Folder path', size=128, required=True,
             help='Path folder, ex.: /home/admin/photo'),
@@ -65,4 +67,99 @@ class ProductImageCategory(orm.Model):
             help='ex. for code P1010 variant 001: P1010.001.jpg'),    
         }
 
+class ProductProductImage(osv.osv):
+    ''' Add extra function and fields for manage picture for product
+    '''
+    _inherit = 'product.product'
+     
+    def _get_product_image_list(
+            self, cr, uid, ids, category_id, context=None):
+        ''' Return list of product and image for category_id passed
+        '''        
+        context = context or {}        
+        res = dict.fromkeys(ids, False) # init res record
+
+        if not category_id:
+            _logger.error('Category default not present in parameters!')
+            return res
+        
+        # Read parameter for category passed:
+        category_proxy = self.pool.get('product.image.category').browse(
+            cr, uid, category_id, context=context)
+        
+        image_path = os.path.expanduser(category_proxy.path)
+        #empty_image = os.path.join(image_path, category_proxy.empty_image)
+        if not image_path:
+            _logger.error('Path for category: %s not found!' % category_id)
+            return res
+        
+        for product in self.browse(cr, uid, ids, context=context):            
+            code = product_browse.default_code or ''
+            if not code:
+                _logger.error('Code not found: %s' % product.name)
+                continue
+            
+            # Prepare code:    
+            if category_proxy.upper_code:
+                code = code.upper()
+            else:        
+                code = code.lower()
+            code = code.replace(' ', '_') # no space in code
+            
+            # Prepare block elements:
+            parent_block = [len(code)]
+            try:
+                if category_proxy.parent_format:
+                    parent_block.extend(eval(category_proxy.parent_format))
+                parent_block = parent_block.sort().reverse()
+            except:
+                _logger.error('Block element error: use only code')
+
+            # Loop on block part:            
+            for width in parent_block:
+                parent_code = code[:width]
+                image = '%s.%s' % (
+                    os.path.join(image_path, parent_code),
+                    category_proxy.extension_image,
+                    )    
+                try:
+                    (filename, header) = urllib.urlretrieve(image)
+                    f = open(filename , 'rb')
+                    img = base64.encodestring(f.read())
+                    f.close()
+                except:
+                    img = False
+                if img:
+                    res[product.id] = img
+                    break # no more elements (found first)
+        return res
+
+    def _get_product_image_quotation(self, cr, uid, ids, field_name, arg, 
+            context=None):
+        ''' Search category for quotation picture in config and return list:
+        '''
+        # Search parameter: category code for quotation:
+        config_pool = self.pool.get('ir.config_parameter')
+        category_id = False
+        config_ids = config_pool.search(cr, uid, [
+            ('key', '=', 'product.image.quotation')], context=context)
+         
+        # Read value from code:    
+        if config_ids:
+            config_proxy = config_pool.browse(
+                cr, uid, config_ids, context=context)[0]
+            category_ids = self.pool.get('product.image.category').search(
+                cr, uid, [
+                    ('code', '=', config_proxy.value)], context=context)
+            if category_ids:
+                category_id = category_ids[0]    
+        
+        # Read images from folder:
+        return _get_product_image_list(
+            self, cr, uid, ids, category_id, context=None)    
+
+    _columns = {
+        'product_image_quotation': fields.function(
+            _get_product_image_quotation, type='binary', method=True),
+        }
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
