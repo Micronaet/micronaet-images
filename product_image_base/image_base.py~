@@ -75,8 +75,13 @@ class ProductProductImage(osv.osv):
     def _get_product_image_list(
             self, cr, uid, ids, category_id, context=None):
         ''' Return list of product and image for category_id passed
+            context parameters: 
+                only_name: return only name depend if file exist:
         '''        
+        # Read parameters:
         context = context or {}        
+        only_name = context.get('only_name', False)
+        
         res = dict.fromkeys(ids, False) # init res record
 
         if not category_id:
@@ -130,7 +135,10 @@ class ProductProductImage(osv.osv):
                 except:
                     img = False
                 if img:
-                    res[product.id] = img
+                    if only_name:
+                        res[product.id] = image
+                    else:
+                        res[product.id] = img
                     break # no more elements (found first)
         return res
 
