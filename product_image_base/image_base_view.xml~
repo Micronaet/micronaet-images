@@ -1,12 +1,12 @@
 <?xml version="1.0"?>
 <openerp>
     <data>
-    <!-- product.image.category: -->
-    <record id="product_product_image_category_tree_view" model="ir.ui.view">
-        <field name="name">Image category</field>
-        <field name="model">product.image.category</field>
+    <!-- product.image.album: -->
+    <record id="product_product_image_album_tree_view" model="ir.ui.view">
+        <field name="name">Image album</field>
+        <field name="model">product.image.album</field>
         <field name="arch" type="xml">
-            <tree string="Image category">
+            <tree string="Image album">
                 <field name="code" />
                 <field name="name" />
                 <field name="path" />
@@ -20,11 +20,11 @@
             </tree>
         </field>
     </record>
-    <record id="product_product_image_category_form_view" model="ir.ui.view">
-        <field name="name">Image category</field>
-        <field name="model">product.image.category</field>
+    <record id="product_product_image_album_form_view" model="ir.ui.view">
+        <field name="name">Image album</field>
+        <field name="model">product.image.album</field>
         <field name="arch" type="xml">
-            <form string="Image category" version="7.0">
+            <form string="Image album" version="7.0">
                 <sheet>
                     <group colspan="4" col="4">
                         <field name="code" />
@@ -47,16 +47,16 @@
         </field>
     </record>
 
-    <record id="product_product_image_category_action" model="ir.actions.act_window">
-        <field name="name">Image category</field>
-        <field name="res_model">product.image.category</field>
+    <record id="product_product_image_album_action" model="ir.actions.act_window">
+        <field name="name">Image album</field>
+        <field name="res_model">product.image.album</field>
         <field name="view_type">form</field>        
         <field name="view_mode">tree,form</field>        
         <field name="help">Folder where are stored images</field>
     </record>
 
-    <menuitem action="product_product_image_category_action" 
-              id="product_product_image_category_action_menu" 
+    <menuitem action="product_product_image_album_action" 
+              id="product_product_image_album_action_menu" 
               parent="product.prod_config_main" 
               sequence="10" /> 
     </data>

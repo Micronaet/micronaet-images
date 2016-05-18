@@ -11,8 +11,8 @@
              <field name="value">PRODUCT</field>
          </record>
 
-         <!-- product.image.category -->
-         <record model="product.image.category" id="view_product_image_category_quotation">
+         <!-- product.image.album -->
+         <record model="product.image.album" id="view_product_image_album_quotation">
              <field name="code">QUOTATION</field>
              <field name="name">Quotation</field>
              <field name="path">~/photo/quotation/company</field>
@@ -21,7 +21,7 @@
              <field name="upper_code">1</field>
              <field name="has_variant">1</field>
          </record>
-         <record model="product.image.category" id="view_product_image_category_product">
+         <record model="product.image.album" id="view_product_image_album_product">
              <field name="code">PRODUCT</field>
              <field name="name">Product</field>
              <field name="path">~/photo/product/company</field>
@@ -30,7 +30,7 @@
              <field name="upper_code">1</field>
              <field name="has_variant">1</field>
          </record>         
-         <record model="product.image.category" id="view_product_image_category_environment">
+         <record model="product.image.album" id="view_product_image_album_environment">
              <field name="code">ENVIRONMENT</field>
              <field name="name">Environment</field>
              <field name="path">~/photo/environment/company</field>
@@ -39,7 +39,7 @@
              <field name="upper_code">1</field>
              <field name="has_variant">1</field>
          </record>
-         <record model="product.image.category" id="view_product_image_category_chroma">
+         <record model="product.image.album" id="view_product_image_album_chroma">
              <field name="code">CHROMA</field>
              <field name="name">Chroma</field>
              <field name="path">~/photo/chroma/company</field>
@@ -48,7 +48,7 @@
              <field name="upper_code">1</field>
              <field name="has_variant">1</field>
          </record>
-         <record model="product.image.category" id="view_product_image_category_video">
+         <record model="product.image.album" id="view_product_image_album_video">
              <field name="code">VIDEO</field>
              <field name="name">Video</field>
              <field name="path">~/photo/video/company</field>
@@ -57,7 +57,7 @@
              <field name="upper_code">1</field>
              <field name="has_variant">1</field>
          </record>
-         <record model="product.image.category" id="view_product_image_category_360">
+         <record model="product.image.album" id="view_product_image_album_360">
              <field name="code">360</field>
              <field name="name">360</field>
              <field name="path">~/photo/360/company</field>

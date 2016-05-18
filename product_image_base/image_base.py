@@ -40,11 +40,11 @@ from openerp.tools import (DEFAULT_SERVER_DATE_FORMAT,
 
 _logger = logging.getLogger(__name__)
 
-class ProductImageCategory(orm.Model):
-    """ Model name: ProductImageCategory
+class ProductImageAlbum(orm.Model):
+    """ Model name: ProductImageAlbum
     """
-    _name = 'product.image.category'
-    _description = 'Image category'
+    _name = 'product.image.album'
+    _description = 'Image album'
     
     _columns = {
         'code': fields.char('Code', size=10, required=True, 
@@ -58,15 +58,76 @@ class ProductImageCategory(orm.Model):
             'Extension', size=10, required=True,
             help="without dot, for ex.: jpg"
             ),
-        'width': fields.integer('Max width in px.'),
-        'height': fields.integer('Max height in px.'),
+        'max_width': fields.integer('Max width in px.'),
+        'max_height': fields.integer('Max height in px.'),
         'empty_image': fields.char(
             'Empty image', size=64, 
             help='Complete name + ext. of empty image, ex.: 0.jpg'),
         'upper_code': fields.boolean('Upper code',
             help='Name is code in upper case: abc10 >> ABC10.png'),
         'has_variant': fields.boolean('Has variants', 
-            help='ex. for code P1010 variant 001: P1010.001.jpg'),    
+            help='ex. for code P1010 variant 001: P1010-001.jpg'),
+        }
+
+class ProductImagealbumCalculated(orm.Model):
+    """ Add fields for manage calculated folders
+    """
+    _inherit = 'product.image.album'
+    
+    _columns = {        
+        'calculated': fields.boolean('Calculated', 
+            help='Folder is calculated from another images'),
+        'album_id': fields.many2one(
+            'product.image.album', 'Parent album', 
+            domain=[('calculated', '=', False)]),
+         
+        # Dimension for calculating:    
+        'width': fields.integer('Width in px.'),
+        'height': fields.integer('Height in px.'),
+        'redimension_type' :fields.selection([
+            ('length', 'Max length'),
+            ('width', 'Max width'),
+            ('max', 'Max large (lenght or width)'),            
+            ], 'Redimension type', readonly=False, )
+        }
+
+    _defaults = {
+        # Default value:
+        'redimension_type:': lambda *x: 'max',    
+        }    
+
+class ProductImageFile(orm.Model):
+    """ Model name: ProductImageFile
+    """
+    _name = 'product.image.file'
+    _description = 'Image file'
+    _rec_name = 'filename'
+    _order = 'filename'
+    
+    # -----------------
+    # Scheduled action:
+    # -----------------
+    def syncro_image_album(self, cr, uid, context=None):
+        ''' Import image for album marked (not calculated)
+        '''
+        # TODO 
+        return True
+    
+    _columns = {
+        'filename': fields.char('Filename', size=20, required=True),
+        'album_id': fields.many2one('product.image.album', 'album'), 
+        'exist': fields.boolean('Exist'),    
+        'timestamp': fields.char('Timestamp', size=20),
+        'variant': fields.boolean('Variant', 
+            help='File format CODE-XXX.jpg where XXX is variant block'),
+        'variant_code': fields.char('Variant code', size=5),
+        'product_id': fields.many2one('product.product', 'Product'),
+
+        # Used?:
+        'width': fields.integer('Width px.'),
+        'height': fields.integer('Height px.'),
+        # TODO file format
+        # TODO file image binary 
         }
 
 class ProductProductImage(osv.osv):
@@ -75,8 +136,8 @@ class ProductProductImage(osv.osv):
     _inherit = 'product.product'
      
     def _get_product_image_list(
-            self, cr, uid, ids, category_id, context=None):
-        ''' Return list of product and image for category_id passed
+            self, cr, uid, ids, album_id, context=None):
+        ''' Return list of product and image for album_id passed
             context parameters: 
                 only_name: return only name depend if file exist:
         '''  
@@ -86,18 +147,18 @@ class ProductProductImage(osv.osv):
         
         res = dict.fromkeys(ids, False) # init res record
 
-        if not category_id:
-            _logger.error('Category default not present in parameters!')
+        if not album_id:
+            _logger.error('album default not present in parameters!')
             return res
         
-        # Read parameter for category passed:
-        category_proxy = self.pool.get('product.image.category').browse(
-            cr, uid, category_id, context=context)
+        # Read parameter for album passed:
+        album_proxy = self.pool.get('product.image.album').browse(
+            cr, uid, album_id, context=context)
 
-        image_path = os.path.expanduser(category_proxy.path)
-        #empty_image = os.path.join(image_path, category_proxy.empty_image)
+        image_path = os.path.expanduser(album_proxy.path)
+        #empty_image = os.path.join(image_path, album_proxy.empty_image)
         if not image_path:
-            _logger.error('Path for category: %s not found!' % category_id)
+            _logger.error('Path for album: %s not found!' % album_id)
             return res
         for product in self.browse(cr, uid, ids, context=context):            
             code = product.default_code or ''
@@ -106,7 +167,7 @@ class ProductProductImage(osv.osv):
                 continue
 
             # Prepare code:    
-            if category_proxy.upper_code:
+            if album_proxy.upper_code:
                 code = code.upper()
             else:        
                 code = code.lower()
@@ -115,8 +176,8 @@ class ProductProductImage(osv.osv):
             # Prepare block elements:
             parent_block = [len(code)]
             try:
-                if category_proxy.parent_format:
-                    for item in category_proxy.parent_format.split('|'):
+                if album_proxy.parent_format:
+                    for item in album_proxy.parent_format.split('|'):
                         parent_block.append(int(item))
                 parent_block.sort()
                 parent_block.reverse()
@@ -128,7 +189,7 @@ class ProductProductImage(osv.osv):
                 parent_code = code[:width]
                 image = '%s.%s' % (
                     os.path.join(image_path, parent_code),
-                    category_proxy.extension_image,
+                    album_proxy.extension_image,
                     )    
                 try:
                     (filename, header) = urllib.urlretrieve(image)
@@ -148,7 +209,7 @@ class ProductProductImage(osv.osv):
 
     def _get_product_image_quotation(self, cr, uid, ids, field_name, arg, 
             context=None):
-        ''' Search category for quotation picture in config and return list:
+        ''' Search album for quotation picture in config and return list:
             context parameters:
                 'product_image': image code to open, ex.: QUOTATION (default)
         '''
@@ -175,22 +236,22 @@ class ProductProductImage(osv.osv):
                 product_image = config_proxy.value                
 
         # -------------------------------
-        # Try to read category if present
+        # Try to read album if present
         # (passed or config parameter)
         # -------------------------------        
-        category_ids = self.pool.get('product.image.category').search(
+        album_ids = self.pool.get('product.image.album').search(
             cr, uid, [('code', '=', product_image)], context=context)
-        if category_ids:
-            category_id = category_ids[0]    
+        if album_ids:
+            album_id = album_ids[0]    
         else:    
-            category_id = False
+            album_id = False
         
         # Read images from folder:
         return self._get_product_image_list(
-            cr, uid, ids, category_id, context=None)    
+            cr, uid, ids, album_id, context=None)    
 
     _columns = {
         'product_image_quotation': fields.function(
             _get_product_image_quotation, type='binary', method=True),
-        }
+        }        
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
