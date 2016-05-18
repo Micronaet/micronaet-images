@@ -80,11 +80,22 @@ class ProductImageFile(orm.Model):
     # -----------------
     # Utility function:
     # -----------------
-    def get_default_code(self, filename, extansion_image, upper_code):
+    def get_default_code(self, filename):
         ''' Function that extract default_code from filename)
         '''
         # TODO test upper and test extension
-        return filename.split('.')[0].replace('_', ' ')
+        block = filename.split('.')
+        if len(block) == 2:
+            return (
+                block[0].replace('_', ' '),
+                block[1]
+                )
+        else:        
+            return (
+                block[0].replace('_', ' '),
+                '', # no extension when error
+                )
+            
         
     def load_syncro_image_album(self, cr, uid, album_ids, context=None):
         ''' Import image folder for proxy  
@@ -98,6 +109,7 @@ class ProductImageFile(orm.Model):
             # Parameters:
             path = os.path.expanduser(album.path)        
             extension_image = album.extension_image
+            # TODO manage upper case or lower case
             upper_code = album.upper_code
             has_variant = album.has_variant
 
@@ -112,8 +124,9 @@ class ProductImageFile(orm.Model):
                 for filename in files:
                     fullname = os.path.join(root, filename)                
                     timestamp = '%s' % os.path.getmtime(fullname)
-                    default_code = self.get_default_code(
-                        filename, extansion_image, upper_code)
+                    default_code, extension = self.get_default_code(
+                        filename)
+                        
                     product_ids = product_pool.search(cr, uid, [
                         ('default_code', '=', default_code)], context=context)
                     if product_ids:
@@ -127,10 +140,12 @@ class ProductImageFile(orm.Model):
                     data = {
                         'filename': filename,
                         'album_id': album.id,
-                        'exist': True,
                         'updated': True,
                         'timestamp': timestamp,
                         'product_id': product_id, 
+                        'extension': extension,
+                        'status': 'ok' if extension == extension_image \
+                            else 'format',
                         #'variant': False, # TODO
                         #'variant_code': '', # TODO
                         # Used?:
@@ -154,7 +169,7 @@ class ProductImageFile(orm.Model):
         not_exist_ids = self.search(cr, uid, [
             ('id', 'not in', exist_ids)], context=context)            
         return self.write(cr, uid, not_exist_ids, {
-            'exist': False}, context=context)    
+            'status': 'removed'}, context=context)    
     
     # -----------------
     # Scheduled action:
@@ -181,7 +196,6 @@ class ProductImageFile(orm.Model):
     _columns = {
         'filename': fields.char('Filename', size=60, required=True),
         'album_id': fields.many2one('product.image.album', 'album'), 
-        'exist': fields.boolean('Exist'),    
         'updated': fields.boolean('Updated', 
             help='Image has new file, used if recalculated thumbs'),
         'timestamp': fields.char('Timestamp', size=30),
@@ -193,12 +207,19 @@ class ProductImageFile(orm.Model):
         # Used?:
         'width': fields.integer('Width px.'),
         'height': fields.integer('Height px.'),
-        # TODO file format
+        'extension': fields.char(
+            'Extension', size=10, help='Without dot, for ex.: jpg'),
+        'status': fields.selection([
+            ('ok', 'OK'),
+            ('removed', 'File removed'),
+            ('format', 'Wrong format'),
+            ], 'status'),
         # TODO file image binary         
         }
         
     _defaults = {
-        'updated': lambda *x: True, # every new image is to resize
+        'updated': lambda *x: True,
+        'status': lambda *x: 'ok',
         }    
 
 class ProductImageAlbumCalculated(orm.Model):
