@@ -140,26 +140,28 @@ class ProductImageFile(orm.Model):
                     data = {
                         'filename': filename,
                         'album_id': album.id,
-                        'updated': True,
                         'timestamp': timestamp,
                         'product_id': product_id, 
                         'extension': extension,
-                        'status': 'ok' if extension == extension_image \
-                            else 'format',
                         #'variant': False, # TODO
                         #'variant_code': '', # TODO
                         # Used?:
                         #'width': fields.integer('Width px.'),
                         #'height': fields.integer('Height px.'),
                         }
+                    if extension != extension_image:
+                        data['status'] = 'format'
                     
                     if filename in old_filenames:                  
                         # Check timestamp for update
                         item_id = old_filenames[filename][0]
-                        if timestamp != old_filenames[filename][1]:
-                            self.write(cr, uid, item_id, data, context=context)
+                        if 'status' not in data and \
+                                timestamp != old_filenames[filename][1]:
+                            data['status'] = 'modify'                            
+                           
+                        self.write(cr, uid, item_id, data, context=context)                            
                             
-                    else: # Create (default updated)
+                    else: # Create (default modify)
                         item_id = self.create(
                             cr, uid, data, context=context)
                     if item_id:        
@@ -196,8 +198,6 @@ class ProductImageFile(orm.Model):
     _columns = {
         'filename': fields.char('Filename', size=60, required=True),
         'album_id': fields.many2one('product.image.album', 'album'), 
-        'updated': fields.boolean('Updated', 
-            help='Image has new file, used if recalculated thumbs'),
         'timestamp': fields.char('Timestamp', size=30),
         'variant': fields.boolean('Variant', 
             help='File format CODE-XXX.jpg where XXX is variant block'),
@@ -211,15 +211,16 @@ class ProductImageFile(orm.Model):
             'Extension', size=10, help='Without dot, for ex.: jpg'),
         'status': fields.selection([
             ('ok', 'OK'),
+            ('modify', 'File modify'),
             ('removed', 'File removed'),
             ('format', 'Wrong format'),
+            ('product', 'No product'),
             ], 'status'),
         # TODO file image binary         
         }
         
     _defaults = {
-        'updated': lambda *x: True,
-        'status': lambda *x: 'ok',
+        'status': lambda *x: 'modify',
         }    
 
 class ProductImageAlbumCalculated(orm.Model):
