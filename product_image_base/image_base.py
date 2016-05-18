@@ -80,7 +80,7 @@ class ProductImageFile(orm.Model):
     # -----------------
     # Utility function:
     # -----------------    
-    def load_syncro_image_album(self, cr, uid, album_proxy, context=None):
+    def load_syncro_image_album(self, cr, uid, album_ids, context=None):
         ''' Import image folder for proxy  
         '''
         # Pool used:
@@ -95,15 +95,15 @@ class ProductImageFile(orm.Model):
             has_variant = album.has_variant
 
             # Load file current loaded in album folder:
-            filenames = {}
-            for f in album:
-                filename[f.filename] = (f.id, f.timestamp)
+            old_filenames = {}
+            for old_file in album.image_ids:
+                old_filenames[old_file.filename] = (
+                    old_file.id, old_file.timestamp)
             
             # Read all files in folder:
-            for root, directories, files in os.walk(directory):
+            for root, directories, files in os.walk(path):
                 for filename in files:
                     fullname = os.path.join(root, filename)                
-                    file_paths.append(filename)
                     timestamp = os.path.getmtime(fullname)
                     
                     data = {
@@ -119,17 +119,20 @@ class ProductImageFile(orm.Model):
                         #'width': fields.integer('Width px.'),
                         #'height': fields.integer('Height px.'),
                         }
-
-                    if filename in filenames:                  
-                        item_id = filenames[filename][0]
+                    
+                    if filename in old_filenames:                  
                         # Check timestamp for update
-                        if timestamp != filenames[filename][1]
+                        if timestamp != old_filenames[filename][1]:
+                            item_id = old_filenames[filename][0]
                             self.write(cr, uid, item_id, data, context=context)
+                        else: 
+                            item_id = False
                             
                     else: # Create (default updated)
                         item_id = self.create(
                             cr, uid, data, context=context)
-                    exist_ids.append(item_id) # after force exist value to false        
+                    if item_id:        
+                        exist_ids.append(item_id) # after will force exist
         
         # Mark image no more present (for all albums):
         not_exist_ids = self.search(cr, uid, [
@@ -163,7 +166,7 @@ class ProductImageFile(orm.Model):
         return True
     
     _columns = {
-        'filename': fields.char('Filename', size=20, required=True),
+        'filename': fields.char('Filename', size=60, required=True),
         'album_id': fields.many2one('product.image.album', 'album'), 
         'exist': fields.boolean('Exist'),    
         'updated': fields.boolean('Updated', 

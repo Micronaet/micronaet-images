@@ -6,7 +6,7 @@
         <field name="name">Image file</field>
         <field name="model">product.image.file</field>
         <field name="arch" type="xml">
-            <tree string="Image album" colors="red:product_id==False;grey:exist==False;blue:variant==True">
+            <tree string="Image album" colors="grey:exist==False;red:product_id==False;blue:variant==True">
                 <field name="exist" />
                 <field name="album_id" invisible="context.get('embedded_form',False)"/>
                 <field name="product_id" />
