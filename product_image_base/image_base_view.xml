@@ -8,6 +8,7 @@
         <field name="arch" type="xml">
             <tree string="Image album" colors="grey:exist==False;red:product_id==False;blue:variant==True">
                 <field name="exist" />
+                <field name="updated" />
                 <field name="album_id" invisible="context.get('embedded_form',False)"/>
                 <field name="product_id" />
                 <field name="filename" />

@@ -79,12 +79,19 @@ class ProductImageFile(orm.Model):
 
     # -----------------
     # Utility function:
-    # -----------------    
+    # -----------------
+    def get_default_code(self, filename, extansion_image, upper_code):
+        ''' Function that extract default_code from filename)
+        '''
+        # TODO test upper and test extension
+        return filename.split('.')[0].replace('_', ' ')
+        
     def load_syncro_image_album(self, cr, uid, album_ids, context=None):
         ''' Import image folder for proxy  
         '''
         # Pool used:
         album_pool = self.pool.get('product.image.album')
+        product_pool = self.pool.get('product.product')
 
         exist_ids = [] # for all albums        
         for album in album_pool.browse(cr, uid, album_ids, context=context):
@@ -104,7 +111,18 @@ class ProductImageFile(orm.Model):
             for root, directories, files in os.walk(path):
                 for filename in files:
                     fullname = os.path.join(root, filename)                
-                    timestamp = os.path.getmtime(fullname)
+                    timestamp = '%s' % os.path.getmtime(fullname)
+                    default_code = self.get_default_code(
+                        filename, extansion_image, upper_code)
+                    product_ids = product_pool.search(cr, uid, [
+                        ('default_code', '=', default_code)], context=context)
+                    if product_ids:
+                        if len(product_ids) > 1:
+                            _logger.error('More than one product code: %s' % (
+                                default_code))
+                        product_id = product_ids[0]            
+                    else:
+                        product_id = False    
                     
                     data = {
                         'filename': filename,
@@ -112,7 +130,7 @@ class ProductImageFile(orm.Model):
                         'exist': True,
                         'updated': True,
                         'timestamp': timestamp,
-                        #'product_id': # TODO,
+                        'product_id': product_id, 
                         #'variant': False, # TODO
                         #'variant_code': '', # TODO
                         # Used?:
@@ -122,11 +140,9 @@ class ProductImageFile(orm.Model):
                     
                     if filename in old_filenames:                  
                         # Check timestamp for update
+                        item_id = old_filenames[filename][0]
                         if timestamp != old_filenames[filename][1]:
-                            item_id = old_filenames[filename][0]
                             self.write(cr, uid, item_id, data, context=context)
-                        else: 
-                            item_id = False
                             
                     else: # Create (default updated)
                         item_id = self.create(
@@ -137,11 +153,8 @@ class ProductImageFile(orm.Model):
         # Mark image no more present (for all albums):
         not_exist_ids = self.search(cr, uid, [
             ('id', 'not in', exist_ids)], context=context)            
-        self.write(cr, uid, not_exist_ids, {
-            'exist': False,
-            }, context=context)    
-                
-        return True
+        return self.write(cr, uid, not_exist_ids, {
+            'exist': False}, context=context)    
     
     # -----------------
     # Scheduled action:
@@ -171,7 +184,7 @@ class ProductImageFile(orm.Model):
         'exist': fields.boolean('Exist'),    
         'updated': fields.boolean('Updated', 
             help='Image has new file, used if recalculated thumbs'),
-        'timestamp': fields.char('Timestamp', size=20),
+        'timestamp': fields.char('Timestamp', size=30),
         'variant': fields.boolean('Variant', 
             help='File format CODE-XXX.jpg where XXX is variant block'),
         'variant_code': fields.char('Variant code', size=5),
