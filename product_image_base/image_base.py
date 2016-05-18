@@ -56,7 +56,7 @@ class ProductImageAlbum(orm.Model):
             help='Parent code list for product composition, ex.: 3|5'),
         'extension_image': fields.char(
             'Extension', size=10, required=True,
-            help="without dot, for ex.: jpg"
+            help="Without dot, for ex.: jpg"
             ),
         'max_width': fields.integer('Max width in px.'),
         'max_height': fields.integer('Max height in px.'),
@@ -76,6 +76,69 @@ class ProductImageFile(orm.Model):
     _description = 'Image file'
     _rec_name = 'filename'
     _order = 'filename'
+
+    # -----------------
+    # Utility function:
+    # -----------------    
+    def load_syncro_image_album(self, cr, uid, album_proxy, context=None):
+        ''' Import image folder for proxy  
+        '''
+        # Pool used:
+        album_pool = self.pool.get('product.image.album')
+
+        exist_ids = [] # for all albums        
+        for album in album_pool.browse(cr, uid, album_ids, context=context):
+            # Parameters:
+            path = os.path.expanduser(album.path)        
+            extension_image = album.extension_image
+            upper_code = album.upper_code
+            has_variant = album.has_variant
+
+            # Load file current loaded in album folder:
+            filenames = {}
+            for f in album:
+                filename[f.filename] = (f.id, f.timestamp)
+            
+            # Read all files in folder:
+            for root, directories, files in os.walk(directory):
+                for filename in files:
+                    fullname = os.path.join(root, filename)                
+                    file_paths.append(filename)
+                    timestamp = os.path.getmtime(fullname)
+                    
+                    data = {
+                        'filename': filename,
+                        'album_id': album.id,
+                        'exist': True,
+                        'updated': True,
+                        'timestamp': timestamp,
+                        #'product_id': # TODO,
+                        #'variant': False, # TODO
+                        #'variant_code': '', # TODO
+                        # Used?:
+                        #'width': fields.integer('Width px.'),
+                        #'height': fields.integer('Height px.'),
+                        }
+
+                    if filename in filenames:                  
+                        item_id = filenames[filename][0]
+                        # Check timestamp for update
+                        if timestamp != filenames[filename][1]
+                            self.write(cr, uid, item_id, data, context=context)
+                            
+                    else: # Create (default updated)
+                        item_id = self.create(
+                            cr, uid, data, context=context)
+                    exist_ids.append(item_id) # after force exist value to false        
+        
+        # Mark image no more present (for all albums):
+        not_exist_ids = self.search(cr, uid, [
+            ('id', 'not in', exist_ids)], context=context)            
+        self.write(cr, uid, not_exist_ids, {
+            'exist': False,
+            }, context=context)    
+                
+        return True
     
     # -----------------
     # Scheduled action:
@@ -83,13 +146,28 @@ class ProductImageFile(orm.Model):
     def syncro_image_album(self, cr, uid, context=None):
         ''' Import image for album marked (not calculated)
         '''
-        # TODO 
+        # pool used:
+        album_pool = self.pool.get('product.image.album')
+
+        # ---------------------------------------        
+        # Load all image in album not calculated:
+        # ---------------------------------------       
+        album_ids = album_pool.search(cr, uid, [
+            ('calculated', '=', False)], context=context)        
+        self.load_syncro_image_album(cr, uid, album_ids, context=context)
+
+        # TODO Calculate image
+        
+        # TODO Load all image in album and reload elements:
+                
         return True
     
     _columns = {
         'filename': fields.char('Filename', size=20, required=True),
         'album_id': fields.many2one('product.image.album', 'album'), 
         'exist': fields.boolean('Exist'),    
+        'updated': fields.boolean('Updated', 
+            help='Image has new file, used if recalculated thumbs'),
         'timestamp': fields.char('Timestamp', size=20),
         'variant': fields.boolean('Variant', 
             help='File format CODE-XXX.jpg where XXX is variant block'),
@@ -100,8 +178,12 @@ class ProductImageFile(orm.Model):
         'width': fields.integer('Width px.'),
         'height': fields.integer('Height px.'),
         # TODO file format
-        # TODO file image binary 
+        # TODO file image binary         
         }
+        
+    _defaults = {
+        'updated': lambda *x: True, # every new image is to resize
+        }    
 
 class ProductImageAlbumCalculated(orm.Model):
     """ Add fields for manage calculated folders
