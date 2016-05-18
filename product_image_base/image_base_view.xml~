@@ -51,13 +51,13 @@
                            </page>
                             <page string="Calculated" attrs="{'invisible':[('calculated','=',False)]}">
                                 <group colspan="4" col="4">
-                                    <field name="album_id" string="Origin" attrs="{'required':[('calculated','=',True)]}"/>
-                                    <field name="redimension_type" />
-                                    <field name="height" />
-                                    <field name="width" />
-                                </group>    
+                                    <field name="album_id" string="Origin" attrs="{'required':[('calculated','=',True)]}" domain="[('id','!=',active_id)]"/>
+                                    <field name="redimension_type" attrs="{'required':[('calculated','=',True)]}" />
+                                    <field name="height" attrs="{'required':[('calculated','=',True),('redimension_type','=','length')]}" />
+                                    <field name="width" attrs="{'required':[('calculated','=',True),('redimension_type','=','width')]}" />
+                                </group>
                            </page>
-                        </notebook>                        
+                        </notebook>                   
                     </group>
                 </sheet>
             </form>
