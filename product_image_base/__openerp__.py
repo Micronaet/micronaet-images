@@ -29,7 +29,7 @@
     'license': 'AGPL-3',
     'depends': [
         'base',
-        'product',
+        'product',        
         ],
     'init_xml': [],
     'demo': [],
@@ -38,6 +38,7 @@
         'image_base_view.xml',
         
         'data/config_data.xml',
+        'scheduler.xml',
         ],
     'active': False,
     'installable': True,
