@@ -149,12 +149,17 @@ class ProductImageFile(orm.Model):
                         #'width': fields.integer('Width px.'),
                         #'height': fields.integer('Height px.'),
                         }
+                        
+                    # Status error case:    
                     if extension != extension_image:
                         data['status'] = 'format'
+                    elif not product_id:
+                        data['status'] = 'product'
                     
                     if filename in old_filenames:                  
                         # Check timestamp for update
                         item_id = old_filenames[filename][0]
+                        # Check also status error not present:
                         if 'status' not in data and \
                                 timestamp != old_filenames[filename][1]:
                             data['status'] = 'modify'                            
