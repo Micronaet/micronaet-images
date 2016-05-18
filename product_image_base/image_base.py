@@ -69,33 +69,6 @@ class ProductImageAlbum(orm.Model):
             help='ex. for code P1010 variant 001: P1010-001.jpg'),
         }
 
-class ProductImagealbumCalculated(orm.Model):
-    """ Add fields for manage calculated folders
-    """
-    _inherit = 'product.image.album'
-    
-    _columns = {        
-        'calculated': fields.boolean('Calculated', 
-            help='Folder is calculated from another images'),
-        'album_id': fields.many2one(
-            'product.image.album', 'Parent album', 
-            domain=[('calculated', '=', False)]),
-         
-        # Dimension for calculating:    
-        'width': fields.integer('Width in px.'),
-        'height': fields.integer('Height in px.'),
-        'redimension_type' :fields.selection([
-            ('length', 'Max length'),
-            ('width', 'Max width'),
-            ('max', 'Max large (lenght or width)'),            
-            ], 'Redimension type', readonly=False, )
-        }
-
-    _defaults = {
-        # Default value:
-        'redimension_type:': lambda *x: 'max',    
-        }    
-
 class ProductImageFile(orm.Model):
     """ Model name: ProductImageFile
     """
@@ -128,6 +101,42 @@ class ProductImageFile(orm.Model):
         'height': fields.integer('Height px.'),
         # TODO file format
         # TODO file image binary 
+        }
+
+class ProductImageAlbumCalculated(orm.Model):
+    """ Add fields for manage calculated folders
+    """
+    _inherit = 'product.image.album'
+
+    _columns = {        
+        # -------------------
+        # Redimension fields:
+        # -------------------
+        'calculated': fields.boolean('Calculated', 
+            help='Folder is calculated from another images'),
+        'album_id': fields.many2one(
+            'product.image.album', 'Parent album', 
+            domain=[('calculated', '=', False)]),
+         
+        # Dimension for calculating:    
+        'width': fields.integer('Width in px.'),
+        'height': fields.integer('Height in px.'),
+        'redimension_type' :fields.selection([
+            ('length', 'Max length'),
+            ('width', 'Max width'),
+            ('max', 'Max large (lenght or width)'),            
+            ], 'Redimension type'),
+
+        # ----------------------
+        # Relation 2many fields:
+        # ----------------------
+        'image_ids': fields.one2many(
+            'product.image.file', 'album_id', 'Files'),
+        }
+
+    _defaults = {
+        # Default value:
+        'redimension_type:': lambda *x: 'max',    
         }
 
 class ProductProductImage(osv.osv):
