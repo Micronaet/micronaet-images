@@ -80,7 +80,7 @@ class ProductImageFile(orm.Model):
     # -----------------
     # Utility function:
     # -----------------
-    def get_default_code(self, filename):
+    def get_default_code(self, variant, filename):
         ''' Function that extract default_code from filename)
         '''
         # TODO test upper and test extension
@@ -88,11 +88,19 @@ class ProductImageFile(orm.Model):
         if len(block) == 2:
             return (
                 block[0].replace('_', ' '),
+                False,
                 block[1]
+                )
+        if len(block) == 3: # variant 
+            return (
+                block[0].replace('_', ' '),
+                block[1],                
+                block[2],
                 )
         else:        
             return (
                 block[0].replace('_', ' '),
+                False,
                 '', # no extension when error
                 )
             
@@ -109,7 +117,7 @@ class ProductImageFile(orm.Model):
             # Parameters:
             path = os.path.expanduser(album.path)        
             extension_image = album.extension_image
-            # TODO manage upper case or lower case
+            # TODO manage upper case or lower case and variant!
             upper_code = album.upper_code
             has_variant = album.has_variant
 
@@ -124,7 +132,7 @@ class ProductImageFile(orm.Model):
                 for filename in files:
                     fullname = os.path.join(root, filename)                
                     timestamp = '%s' % os.path.getmtime(fullname)
-                    default_code, extension = self.get_default_code(
+                    default_code, variant, extension = self.get_default_code(
                         filename)
                         
                     product_ids = product_pool.search(cr, uid, [
@@ -143,12 +151,13 @@ class ProductImageFile(orm.Model):
                         'timestamp': timestamp,
                         'product_id': product_id, 
                         'extension': extension,
-                        #'variant': False, # TODO
-                        #'variant_code': '', # TODO
                         # Used?:
                         #'width': fields.integer('Width px.'),
                         #'height': fields.integer('Height px.'),
                         }
+                    if variant:
+                        data['variant'] = True
+                        data_code['variant'] = variant                            
                         
                     # Status error case:    
                     if extension != extension_image:
