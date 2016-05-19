@@ -157,7 +157,7 @@ class ProductImageFile(orm.Model):
                         }
                     if variant:
                         data['variant'] = True
-                        data_code['variant'] = variant                            
+                        data['variant_code'] = variant                            
                         
                     # Status error case:    
                     if extension != extension_image:
