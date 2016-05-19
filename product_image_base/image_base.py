@@ -80,7 +80,7 @@ class ProductImageFile(orm.Model):
     # -----------------
     # Utility function:
     # -----------------
-    def get_default_code(self, variant, filename):
+    def get_default_code(self, filename):
         ''' Function that extract default_code from filename)
         '''
         # TODO test upper and test extension
