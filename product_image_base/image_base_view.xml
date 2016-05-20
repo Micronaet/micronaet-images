@@ -24,6 +24,7 @@
                 <group expand="0" string="Group By">
                     <filter name="group_album" string="Album" context="{'group_by': 'album_id'}"/>
                     <filter name="group_product" string="Product" context="{'group_by': 'product_id'}"/>
+                    <filter name="group_variant" string="Variant" context="{'group_by': 'variant'}"/>
                     <filter name="group_status" string="Status" context="{'group_by': 'status'}"/>
                 </group>                
             </search>
