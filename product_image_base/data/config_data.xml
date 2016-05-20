@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <openerp>
-    <data>
+    <data noupdate="1">
          <!-- ir.config_parameter -->
          <record model="ir.config_parameter" id="view_product_image_quotation">
              <field name="key">product.image.quotation</field>
