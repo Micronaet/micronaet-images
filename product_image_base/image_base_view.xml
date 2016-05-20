@@ -2,6 +2,33 @@
 <openerp>
     <data>
     <!-- product.image.file: -->
+    <record model="ir.ui.view" id="product_product_image_file_search_view">
+        <field name="name">product.image.file.search</field>
+        <field name="model">product.image.file</field>
+        <field name="arch" type="xml">
+            <search string="Image file" version="7.0">        
+                <field name="album_id" filter_domain="[('album_id','=',self)]"/>
+                <field name="product_id" filter_domain="[('product_id','=',self)]"/>
+                <field name="filename" />
+                <field name="extension" />
+                <field name="variant_code" />
+                
+                <filter name="variant_on" string="Variant" domain="[('variant','=',True)]" />
+                <filter name="variant_off" string="Original" domain="[('variant','=',False)]" />
+                
+                <filter name="status_ok" string="OK" domain="[('status','=','ok')]" />
+                <filter name="status_modify" string="Modified" domain="[('status','=','modify')]" />
+                <filter name="status_removed" string="Removed" domain="[('status','=','removed')]" />
+                <filter name="status_format" string="Wrong format" domain="[('status','=','format')]" />
+                <filter name="status_product" string="No product" domain="[('status','=','product')]" />
+                <group expand="0" string="Group By">
+                    <filter name="group_album" string="Album" context="{'group_by': 'album_id'}"/>
+                    <filter name="group_product" string="Product" context="{'group_by': 'product_id'}"/>
+                    <filter name="group_status" string="Status" context="{'group_by': 'status'}"/>
+                </group>                
+            </search>
+        </field>
+    </record>    
     <record id="product_product_image_file_tree_view" model="ir.ui.view">
         <field name="name">Image file</field>
         <field name="model">product.image.file</field>
@@ -17,6 +44,25 @@
                 <field name="height" />
                 <field name="width" />                
                 <field name="status" />
+            </tree>
+        </field>
+    </record>
+    <record id="product_product_image_file_tree_readonly_view" model="ir.ui.view">
+        <field name="name">Image file</field>
+        <field name="model">product.image.file</field>
+        <field name="priority" eval="20" />
+        <field name="arch" type="xml">
+            <tree string="Image album" colors="red:status=='product';grey:status=='removed';blue:status=='modify';green:status=='ok';brown:status=='format';black:variant==True" editable="bottom">
+                <field name="album_id" invisible="context.get('embedded_form',False)" readonly="1"/>
+                <field name="product_id" readonly="1" />
+                <field name="filename" readonly="1" />
+                <field name="extension" readonly="1" />
+                <field name="timestamp" readonly="1" />
+                <field name="variant" readonly="1" />
+                <field name="variant_code" readonly="1" />
+                <field name="height" readonly="1" />
+                <field name="width" readonly="1" />                
+                <field name="status" readonly="1" />
             </tree>
         </field>
     </record>
@@ -45,6 +91,14 @@
                 </sheet>
             </form>
         </field>
+    </record>
+    <record id="product_product_image_file_action" model="ir.actions.act_window">
+        <field name="name">Image file</field>
+        <field name="res_model">product.image.file</field>
+        <field name="view_type">form</field>        
+        <field name="view_mode">tree,form</field>        
+        <field name="view_id" ref="product_product_image_file_tree_readonly_view" />
+        <field name="help">Images file</field>
     </record>
 
     <!-- product.image.album: -->
@@ -122,6 +176,10 @@
               id="product_product_image_album_action_menu" 
               parent="product.prod_config_main" 
               sequence="10" /> 
+        <menuitem action="product_product_image_file_action" 
+                  id="product_product_image_file_action_menu" 
+                  parent="product_product_image_album_action_menu" 
+                  sequence="10" />
     </data>
 </openerp>
 
