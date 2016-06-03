@@ -103,8 +103,7 @@ class ProductImageFile(orm.Model):
                 False,
                 '', # no extension when error
                 )
-            
-        
+                    
     def load_syncro_image_album(self, cr, uid, album_ids, context=None):
         ''' Import image folder for proxy  
         '''
@@ -203,11 +202,49 @@ class ProductImageFile(orm.Model):
             ('calculated', '=', False)], context=context)        
         self.load_syncro_image_album(cr, uid, album_ids, context=context)
 
-        # TODO Calculate image
+        # ---------------------------------------------        
+        # Load all image calculated from another album:
+        # ---------------------------------------------       
+        # TODO
+        album_ids = album_pool.search(cr, uid, [
+            ('calculated', '=', False)], context=context)    
         
         # TODO Load all image in album and reload elements:
                 
         return True
+    
+    '''dim temp_function():
+        from PIL import Image
+
+        # Parameters
+        max_px = 100
+        file_in = 'in.jpg'
+        file_out = 'out.jpg'
+
+        try:
+            img = Image.open(file_in)
+            width, height = img.size
+
+            if width > height:
+                new_width = max_px
+                new_height = height (max_px / width)
+            else:    
+                new_height = max_px
+                new_width = width (max_px / height)
+
+            new_img = img.resize(new_width, new_height, Image.ANTIALIAS)
+            new_img.save(file_out, 'JPEG')
+        except:
+            print "Cannot create thumbnail for '%s'" % infile
+
+                        
+        #comando = "convert '%s' -geometry x%s '%s'" %(os.path.join(cartella_in, nome_file), dimensione, os.path.join(cartella_out, nome_file))
+        #os.system(comando) # lo lancio
+
+        #s = img.size()
+        #ratio = MAXWIDTH / s[0]
+        #newimg = img.resize(
+        #   (s[0] * ratio, s[1] * ratio), Image.ANTIALIAS)'''
     
     _columns = {
         'filename': fields.char('Filename', size=60, required=True),
@@ -381,7 +418,7 @@ class ProductProductImage(osv.osv):
         # -------------------------------
         # Try to read album if present
         # (passed or config parameter)
-        # -------------------------------        
+        # -------------------------------                
         album_ids = self.pool.get('product.image.album').search(
             cr, uid, [('code', '=', product_image)], context=context)
         if album_ids:
