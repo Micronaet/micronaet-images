@@ -32,6 +32,7 @@ from openerp import SUPERUSER_ID, api
 from openerp import tools
 from openerp.tools.translate import _
 from openerp.tools.float_utils import float_round as round
+from PIL import Image
 from openerp.tools import (DEFAULT_SERVER_DATE_FORMAT, 
     DEFAULT_SERVER_DATETIME_FORMAT, 
     DATETIME_FORMATS_MAP, 
@@ -103,9 +104,56 @@ class ProductImageFile(orm.Model):
                 False,
                 '', # no extension when error
                 )
+
+    def calculate_syncro_image_album(self, cr, uid, album_ids, context=None):
+        ''' Calculate image for the album depend on parent album, only for
+            modify elements
+        '''
+        # Pool used:
+        album_pool = self.pool.get('product.image.album')
+        
+        for album in album_pool.browse(cr, uid, ids, context=context):
+            redimension_type = album.redimension_type
+            # TODO for now used max
+            if redimension_type != 'max':   
+                continue
+            max_px = album.max_px
+        return         
+        '''
+
+            # Parameters
+            max_px = 100
+            file_in = 'in.jpg'
+            file_out = 'out.jpg'
+
+            try:
+                img = Image.open(file_in)
+                width, height = img.size
+
+                if width > height:
+                    new_width = max_px
+                    new_height = height (max_px / width)
+                else:    
+                    new_height = max_px
+                    new_width = width (max_px / height)
+
+                new_img = img.resize(new_width, new_height, Image.ANTIALIAS)
+                new_img.save(file_out, 'JPEG')
+            except:
+                print "Cannot create thumbnail for '%s'" % infile
+
+                            
+            #comando = "convert '%s' -geometry x%s '%s'" %(os.path.join(cartella_in, nome_file), dimensione, os.path.join(cartella_out, nome_file))
+            #os.system(comando) # lo lancio
+
+            #s = img.size()
+            #ratio = MAXWIDTH / s[0]
+            #newimg = img.resize(
+            #   (s[0] * ratio, s[1] * ratio), Image.ANTIALIAS)'''
+        return True
                     
     def load_syncro_image_album(self, cr, uid, album_ids, context=None):
-        ''' Import image folder for proxy  
+        ''' Import image folder for proxy (folder non calculated
         '''
         # Pool used:
         album_pool = self.pool.get('product.image.album')
@@ -205,46 +253,13 @@ class ProductImageFile(orm.Model):
         # ---------------------------------------------        
         # Load all image calculated from another album:
         # ---------------------------------------------       
-        # TODO
         album_ids = album_pool.search(cr, uid, [
-            ('calculated', '=', False)], context=context)    
-        
+            ('calculated', '=', False)], context=context)
+        self.calculate_syncro_image_album(cr, uid, album_ids, context=context)
+
         # TODO Load all image in album and reload elements:
                 
         return True
-    
-    '''dim temp_function():
-        from PIL import Image
-
-        # Parameters
-        max_px = 100
-        file_in = 'in.jpg'
-        file_out = 'out.jpg'
-
-        try:
-            img = Image.open(file_in)
-            width, height = img.size
-
-            if width > height:
-                new_width = max_px
-                new_height = height (max_px / width)
-            else:    
-                new_height = max_px
-                new_width = width (max_px / height)
-
-            new_img = img.resize(new_width, new_height, Image.ANTIALIAS)
-            new_img.save(file_out, 'JPEG')
-        except:
-            print "Cannot create thumbnail for '%s'" % infile
-
-                        
-        #comando = "convert '%s' -geometry x%s '%s'" %(os.path.join(cartella_in, nome_file), dimensione, os.path.join(cartella_out, nome_file))
-        #os.system(comando) # lo lancio
-
-        #s = img.size()
-        #ratio = MAXWIDTH / s[0]
-        #newimg = img.resize(
-        #   (s[0] * ratio, s[1] * ratio), Image.ANTIALIAS)'''
     
     _columns = {
         'filename': fields.char('Filename', size=60, required=True),
@@ -258,6 +273,7 @@ class ProductImageFile(orm.Model):
         # Used?:
         'width': fields.integer('Width px.'),
         'height': fields.integer('Height px.'),
+        'max_px': fields.integer('Max px.'), # TODO
         'extension': fields.char(
             'Extension', size=10, help='Without dot, for ex.: jpg'),
         'status': fields.selection([
