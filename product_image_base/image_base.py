@@ -278,7 +278,9 @@ class ProductImageFile(orm.Model):
         # Load all image in album not calculated:
         # ---------------------------------------       
         album_ids = album_pool.search(cr, uid, [
-            ('calculated', '=', False)], context=context)        
+            ('calculated', '=', False),
+            ('schedule_load', '=', True),
+            ], context=context)        
         self.load_syncro_image_album(cr, uid, album_ids, context=context)
 
         # ---------------------------------
@@ -286,7 +288,9 @@ class ProductImageFile(orm.Model):
         # ---------------------------------
         # A. Redimension child calculated album:
         album_ids = album_pool.search(cr, uid, [
-            ('calculated', '=', True)], context=context)
+            ('calculated', '=', True),
+            ('schedule_load', '=', True),
+            ], context=context)
         self.calculate_syncro_image_album(cr, uid, album_ids, context=context)
         
         # B. Reload all image in child album:
