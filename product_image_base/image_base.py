@@ -125,32 +125,34 @@ class ProductImageFile(orm.Model):
             
             # Loop on all modified photos:
             for image in origin.image_ids:
-                if image.status != 'modified':
+                if image.status != 'modify':
                     continue
                             
-            file_in = os.path.join(
-                os.path.expanduser(origin.path), 
-                image.filename)
-            file_out = os.path.join(
-                os.path.expanduser(album.path),
-                image.filename)
+                file_in = os.path.join(
+                    os.path.expanduser(origin.path), 
+                    image.filename)
+                file_out = os.path.join(
+                    os.path.expanduser(album.path),
+                    image.filename)
 
-            try:
-                img = Image.open(file_in)
-                width, height = img.size
+                try:
+                    img = Image.open(file_in)
+                    width, height = img.size
 
-                if width > height:
-                    new_width = max_px
-                    new_height = height (max_px / width)
-                else:    
-                    new_height = max_px
-                    new_width = width (max_px / height)
+                    if width > height:
+                        new_width = max_px
+                        new_height = max_px * height / width
+                    else:    
+                        new_height = max_px
+                        new_width = max_px * width / height
 
-                new_img = img.resize(new_width, new_height, Image.ANTIALIAS)
-                new_img.save(file_out, 'JPEG')
-            except:
-                _logger.error('Cannot create thumbnail for %s' % file_in)
-                continue
+                    new_img = img.resize(
+                        (new_width, new_height), 
+                        Image.ANTIALIAS)
+                    new_img.save(file_out, 'JPEG') # TODO change output!!!!
+                except:
+                    _logger.error('Cannot create thumbnail for %s' % file_in)
+                    continue
                             
             #comando = "convert '%s' -geometry x%s '%s'" 
             #%(os.path.join(cartella_in, nome_file), dimensione, 
