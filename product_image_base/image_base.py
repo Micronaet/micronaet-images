@@ -125,7 +125,10 @@ class ProductImageFile(orm.Model):
                 False,
                 '', # no extension when error
                 )
-
+    
+    # -------------------------------------------------------------------------
+    #                             CALCULATED ALBUM:
+    # -------------------------------------------------------------------------
     def calculate_syncro_image_album(self, cr, uid, album_ids, context=None):
         ''' Calculate image for the album depend on parent album, only for
             modify elements
@@ -146,8 +149,12 @@ class ProductImageFile(orm.Model):
             
             # Loop on all modified photos:
             for image in origin.image_ids:
-                if not album.force_reload and image.status != 'modify':
-                    continue
+                if album.force_reload:
+                    if image.status not in ('modify', 'ok'):
+                        continue # jump error images
+                else:        
+                    if image.status != 'modify':
+                        continue # jump if not modified or error                    
                             
                 file_in = os.path.join(
                     os.path.expanduser(origin.path), 
@@ -186,6 +193,9 @@ class ProductImageFile(orm.Model):
             #   (s[0] * ratio, s[1] * ratio), Image.ANTIALIAS)'''
         return True
                     
+    # -------------------------------------------------------------------------
+    #                             FOLDER IMAGE ALBUM:
+    # -------------------------------------------------------------------------
     def load_syncro_image_album(self, cr, uid, album_ids, context=None):
         ''' Import image folder for proxy (folder non calculated
         '''
@@ -240,13 +250,16 @@ class ProductImageFile(orm.Model):
                         data['variant'] = True
                         data['variant_code'] = variant                            
                         
-                    # Status error case:    
+                    # Status case:
                     if extension != extension_image:
                         data['status'] = 'format'
                     elif not product_id:
                         data['status'] = 'product'
+                    else:
+                        data['status'] = 'ok' # default
                     
-                    if filename in old_filenames:                  
+                    # check file modified in not calculated album:
+                    if not album.calculated and filename in old_filenames:                  
                         # Check timestamp for update
                         item_id = old_filenames[filename][0]
                         # Check also status error not present:
@@ -304,6 +317,7 @@ class ProductImageFile(orm.Model):
             # B. Reload all image in child album:
             self.load_syncro_image_album(
                 cr, uid, album_ids, context=context)
+        # TODO Write as ok the modify files now all are calculated!!        
         return True
     
     _columns = {
