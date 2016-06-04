@@ -255,6 +255,7 @@ class ProductImageFile(orm.Model):
                         data['status'] = 'format'
                     elif not product_id:
                         data['status'] = 'product'
+                    # TODO set ok in calculated albums 
                     
                     # check file modified in not calculated album:
                     if not album.calculated and filename in old_filenames:                  
@@ -276,7 +277,9 @@ class ProductImageFile(orm.Model):
         
         # Mark image no more present (for all albums):
         not_exist_ids = self.search(cr, uid, [
-            ('id', 'not in', exist_ids)], context=context)            
+            ('id', 'not in', exist_ids), # record not updated
+            ('album_id', 'in', album_ids), # only album checked
+            ], context=context)            
         if not_exist_ids:    
             self.write(cr, uid, not_exist_ids, {
             'status': 'removed'}, context=context)    
@@ -309,6 +312,7 @@ class ProductImageFile(orm.Model):
             ('calculated', '=', True),
             ('schedule_load', '=', True),
             ], context=context)
+
         if album_ids:    
             self.calculate_syncro_image_album(
                 cr, uid, album_ids, context=context)
@@ -316,9 +320,16 @@ class ProductImageFile(orm.Model):
             # B. Reload all image in child album:
             self.load_syncro_image_album(
                 cr, uid, album_ids, context=context)
-        else:
+        else:            
             pass # TODO if no album put modify image as ok!!!!
-            
+        
+        # TODO change position but only with currect redimension update 
+        # in ok (now all!!)
+        image_ids = self.search(cr, uid, [
+            ('status', '=', 'modify')], context=context)
+        self.write(cr, uid, image_ids, {
+            'status': 'ok',
+            }, context=context)    
         return True
     
     _columns = {
