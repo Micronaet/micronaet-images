@@ -107,14 +107,16 @@
         <field name="name">Image album</field>
         <field name="model">product.image.album</field>
         <field name="arch" type="xml">
-            <tree string="Image album">
+            <tree string="Image album" colors="blue:calculated==True">
                 <field name="code" />
                 <field name="name" />
                 <field name="path" />
+                <field name="calculated" />
+                <field name="album_id" />
                 <field name="parent_format" />
                 <field name="extension_image" />
-                <field name="height" />
-                <field name="width" />
+                <!--<field name="height" />
+                <field name="width" />-->
                 <field name="empty_image" />
                 <field name="upper_code" />
                 <field name="has_variant" />
@@ -147,6 +149,7 @@
                         <notebook colspan="4">
                             <page string="File" >
                                 <group colspan="4" col="2">
+                                    <button name="clean_not_present" string="Clean album" type="object" icon="gtk-clear"/>
                                     <field name="image_ids" nolabel="1" readonly="1" context="{'embedded_form':True}"/>
                                 </group>    
                            </page>
@@ -156,6 +159,7 @@
                                     <field name="redimension_type" attrs="{'required':[('calculated','=',True)]}" />
                                     <field name="height" attrs="{'required':[('calculated','=',True),('redimension_type','=','length')]}" />
                                     <field name="width" attrs="{'required':[('calculated','=',True),('redimension_type','=','width')]}" />
+                                    <field name="max_px" attrs="{'required':[('calculated','=',True),('redimension_type','=','max')]}" />
                                 </group>
                            </page>
                         </notebook>                   
@@ -175,8 +179,8 @@
 
     <menuitem action="product_product_image_album_action" 
               id="product_product_image_album_action_menu" 
-              parent="product.prod_config_main" 
-              sequence="10" /> 
+              parent="base.menu_product" 
+              sequence="50" /> 
         <menuitem action="product_product_image_file_action" 
                   id="product_product_image_file_action_menu" 
                   parent="product_product_image_album_action_menu" 

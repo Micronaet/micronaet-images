@@ -47,6 +47,17 @@ class ProductImageAlbum(orm.Model):
     _name = 'product.image.album'
     _description = 'Image album'
     
+    # Button event:
+    def clean_not_present(self, cr, uid, ids, context=None):
+        ''' Delete image that no more present in list
+        '''
+        image_pool = self.pool.get('product.image.file')
+        image_ids = image_pool.search(cr, uid, [
+            ('album_id', '=', ids[0]),
+            ('status', '=', 'removed'),
+            ], context=context)            
+        return image_pool.unlink(cr, uid, image_ids, context=context)
+        
     _columns = {
         'code': fields.char('Code', size=10, required=True, 
             help='Used for setup configuration parameters'),
@@ -149,6 +160,7 @@ class ProductImageFile(orm.Model):
                     new_img = img.resize(
                         (new_width, new_height), 
                         Image.ANTIALIAS)
+                    # Filters: NEAREST BILINEAR BICUBIC ANTIALIAS  
                     new_img.save(file_out, 'JPEG') # TODO change output!!!!
                 except:
                     _logger.error('Cannot create thumbnail for %s' % file_in)
@@ -276,7 +288,7 @@ class ProductImageFile(orm.Model):
     
     _columns = {
         'filename': fields.char('Filename', size=60, required=True),
-        'album_id': fields.many2one('product.image.album', 'album'), 
+        'album_id': fields.many2one('product.image.album', 'Album'), 
         'timestamp': fields.char('Timestamp', size=30),
         'variant': fields.boolean('Variant', 
             help='File format CODE-XXX.jpg where XXX is variant block'),
