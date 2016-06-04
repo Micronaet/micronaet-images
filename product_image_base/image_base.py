@@ -259,18 +259,20 @@ class ProductImageFile(orm.Model):
                     else: # Create (default modify)
                         item_id = self.create(
                             cr, uid, data, context=context)
-                    if item_id:        
-                        exist_ids.append(item_id) # after will force exist
+                    #if item_id:        
+                    exist_ids.append(item_id) # after will force exist
         
         # Mark image no more present (for all albums):
         not_exist_ids = self.search(cr, uid, [
             ('id', 'not in', exist_ids)], context=context)            
-        return self.write(cr, uid, not_exist_ids, {
+        if not_exist_ids:    
+            self.write(cr, uid, not_exist_ids, {
             'status': 'removed'}, context=context)    
+        return True    
     
-    # -----------------
-    # Scheduled action:
-    # -----------------
+    # -------------------------------------------------------------------------
+    #                            Scheduled action:
+    # -------------------------------------------------------------------------
     def syncro_image_album(self, cr, uid, context=None):
         ''' Import image for album marked (not calculated)
         '''
@@ -283,8 +285,9 @@ class ProductImageFile(orm.Model):
         album_ids = album_pool.search(cr, uid, [
             ('calculated', '=', False),
             ('schedule_load', '=', True),
-            ], context=context)        
-        self.load_syncro_image_album(cr, uid, album_ids, context=context)
+            ], context=context)
+        if album_ids:    
+            self.load_syncro_image_album(cr, uid, album_ids, context=context)
 
         # ---------------------------------
         # Redimension child image in album:
@@ -294,10 +297,13 @@ class ProductImageFile(orm.Model):
             ('calculated', '=', True),
             ('schedule_load', '=', True),
             ], context=context)
-        self.calculate_syncro_image_album(cr, uid, album_ids, context=context)
-        
-        # B. Reload all image in child album:
-        self.load_syncro_image_album(cr, uid, album_ids, context=context)
+        if album_ids:    
+            self.calculate_syncro_image_album(
+                cr, uid, album_ids, context=context)
+            
+            # B. Reload all image in child album:
+            self.load_syncro_image_album(
+                cr, uid, album_ids, context=context)
         return True
     
     _columns = {
