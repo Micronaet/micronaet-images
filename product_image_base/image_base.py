@@ -113,18 +113,27 @@ class ProductImageFile(orm.Model):
         album_pool = self.pool.get('product.image.album')
         
         for album in album_pool.browse(cr, uid, ids, context=context):
+            origin = album.album_id
             redimension_type = album.redimension_type
+            
             # TODO for now used max
-            if redimension_type != 'max':   
+            if redimension_type != 'max':
                 continue
-            max_px = album.max_px
-        return         
-        '''
-
-            # Parameters
-            max_px = 100
-            file_in = 'in.jpg'
-            file_out = 'out.jpg'
+                
+            # TODO change view    
+            max_px = album.max_px or album.width or album.height or 100 
+            
+            # Loop on all modified photos:
+            for image in origin.image_ids:
+                if image.status != 'modified':
+                    continue
+                            
+            file_in = os.join(
+                os.path.expanduser(origin.path), 
+                image.filename)
+            file_out = os.join(
+                os.path.expanduser(album.path),
+                image.filename)
 
             try:
                 img = Image.open(file_in)
@@ -140,12 +149,13 @@ class ProductImageFile(orm.Model):
                 new_img = img.resize(new_width, new_height, Image.ANTIALIAS)
                 new_img.save(file_out, 'JPEG')
             except:
-                print "Cannot create thumbnail for '%s'" % infile
-
+                _logger.error('Cannot create thumbnail for %s' % file_in)
+                continue
                             
-            #comando = "convert '%s' -geometry x%s '%s'" %(os.path.join(cartella_in, nome_file), dimensione, os.path.join(cartella_out, nome_file))
+            #comando = "convert '%s' -geometry x%s '%s'" 
+            #%(os.path.join(cartella_in, nome_file), dimensione, 
+            #os.path.join(cartella_out, nome_file))
             #os.system(comando) # lo lancio
-
             #s = img.size()
             #ratio = MAXWIDTH / s[0]
             #newimg = img.resize(
@@ -240,7 +250,7 @@ class ProductImageFile(orm.Model):
     def syncro_image_album(self, cr, uid, context=None):
         ''' Import image for album marked (not calculated)
         '''
-        # pool used:
+        # Pool used:
         album_pool = self.pool.get('product.image.album')
 
         # ---------------------------------------        
@@ -250,15 +260,16 @@ class ProductImageFile(orm.Model):
             ('calculated', '=', False)], context=context)        
         self.load_syncro_image_album(cr, uid, album_ids, context=context)
 
-        # ---------------------------------------------        
-        # Load all image calculated from another album:
-        # ---------------------------------------------       
+        # ---------------------------------
+        # Redimension child image in album:
+        # ---------------------------------
+        # A. Redimension child calculated album:
         album_ids = album_pool.search(cr, uid, [
             ('calculated', '=', False)], context=context)
         self.calculate_syncro_image_album(cr, uid, album_ids, context=context)
-
-        # TODO Load all image in album and reload elements:
-                
+        
+        # B. Reload all image in child album:
+        self.load_syncro_image_album(cr, uid, album_ids, context=context)
         return True
     
     _columns = {
