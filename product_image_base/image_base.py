@@ -79,7 +79,14 @@ class ProductImageAlbum(orm.Model):
             help='Name is code in upper case: abc10 >> ABC10.png'),
         'has_variant': fields.boolean('Has variants', 
             help='ex. for code P1010 variant 001: P1010-001.jpg'),
+        'schedule_load': fields.boolean('Schedule Load', 
+            help='''If checked will load with schedule operation else still 
+                have only the images present in this moment'''),
         }
+    
+    _defaults = {
+        'schedule_load': lambda *x: True,
+        }    
 
 class ProductImageFile(orm.Model):
     """ Model name: ProductImageFile
