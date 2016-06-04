@@ -149,7 +149,7 @@
                         <notebook colspan="4">
                             <page string="File" >
                                 <group colspan="4" col="2">
-                                    <button name="clean_not_present" string="Clean album" type="object" icon="gtk-clear"/>
+                                    <button name="clean_not_present" string="Clean album" type="object" icon="gtk-clear" confirm="Image no more found will be removed from this album list"/>
                                     <field name="image_ids" nolabel="1" readonly="1" context="{'embedded_form':True}"/>
                                 </group>    
                            </page>
