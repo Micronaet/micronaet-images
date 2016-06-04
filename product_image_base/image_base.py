@@ -255,14 +255,13 @@ class ProductImageFile(orm.Model):
                         data['status'] = 'format'
                     elif not product_id:
                         data['status'] = 'product'
-                    else:
-                        data['status'] = 'ok' # default
                     
                     # check file modified in not calculated album:
                     if not album.calculated and filename in old_filenames:                  
                         # Check timestamp for update
                         item_id = old_filenames[filename][0]
-                        # Check also status error not present:
+                        
+                        # Note: Keep error if present:
                         if 'status' not in data and \
                                 timestamp != old_filenames[filename][1]:
                             data['status'] = 'modify'                            
@@ -317,7 +316,9 @@ class ProductImageFile(orm.Model):
             # B. Reload all image in child album:
             self.load_syncro_image_album(
                 cr, uid, album_ids, context=context)
-        # TODO Write as ok the modify files now all are calculated!!        
+        else:
+            pass # TODO if no album put modify image as ok!!!!
+            
         return True
     
     _columns = {
