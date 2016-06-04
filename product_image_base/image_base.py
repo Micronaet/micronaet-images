@@ -82,6 +82,9 @@ class ProductImageAlbum(orm.Model):
         'schedule_load': fields.boolean('Schedule Load', 
             help='''If checked will load with schedule operation else still 
                 have only the images present in this moment'''),
+        'force_reload': fields.boolean('Force reload', 
+            help='''Force reload will regenerate all images
+                (used when change dimension etc.)'''),
         }
     
     _defaults = {
@@ -143,7 +146,7 @@ class ProductImageFile(orm.Model):
             
             # Loop on all modified photos:
             for image in origin.image_ids:
-                if image.status != 'modify':
+                if not album.force_reload and image.status != 'modify':
                     continue
                             
                 file_in = os.path.join(
