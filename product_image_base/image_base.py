@@ -112,7 +112,7 @@ class ProductImageFile(orm.Model):
         # Pool used:
         album_pool = self.pool.get('product.image.album')
         
-        for album in album_pool.browse(cr, uid, ids, context=context):
+        for album in album_pool.browse(cr, uid, album_ids, context=context):
             origin = album.album_id
             redimension_type = album.redimension_type
             
@@ -128,10 +128,10 @@ class ProductImageFile(orm.Model):
                 if image.status != 'modified':
                     continue
                             
-            file_in = os.join(
+            file_in = os.path.join(
                 os.path.expanduser(origin.path), 
                 image.filename)
-            file_out = os.join(
+            file_out = os.path.join(
                 os.path.expanduser(album.path),
                 image.filename)
 
@@ -265,7 +265,7 @@ class ProductImageFile(orm.Model):
         # ---------------------------------
         # A. Redimension child calculated album:
         album_ids = album_pool.search(cr, uid, [
-            ('calculated', '=', False)], context=context)
+            ('calculated', '=', True)], context=context)
         self.calculate_syncro_image_album(cr, uid, album_ids, context=context)
         
         # B. Reload all image in child album:
@@ -284,7 +284,6 @@ class ProductImageFile(orm.Model):
         # Used?:
         'width': fields.integer('Width px.'),
         'height': fields.integer('Height px.'),
-        'max_px': fields.integer('Max px.'), # TODO
         'extension': fields.char(
             'Extension', size=10, help='Without dot, for ex.: jpg'),
         'status': fields.selection([
@@ -319,6 +318,7 @@ class ProductImageAlbumCalculated(orm.Model):
         # Dimension for calculating:    
         'width': fields.integer('Width in px.'),
         'height': fields.integer('Height in px.'),
+        'max_px': fields.integer('Max px.'), # TODO
         'redimension_type' :fields.selection([
             ('length', 'Max length'),
             ('width', 'Max width'),
