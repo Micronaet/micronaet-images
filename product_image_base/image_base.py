@@ -182,6 +182,8 @@ class ProductImageFile(orm.Model):
                 except:
                     _logger.error('Cannot create thumbnail for %s' % file_in)
                     continue
+                 
+            # TODO better update here list of files (not with extra procedure) 
                             
             #comando = "convert '%s' -geometry x%s '%s'" 
             #%(os.path.join(cartella_in, nome_file), dimensione, 
@@ -318,18 +320,19 @@ class ProductImageFile(orm.Model):
                 cr, uid, album_ids, context=context)
             
             # B. Reload all image in child album:
-            self.load_syncro_image_album(
-                cr, uid, album_ids, context=context)
-        else:            
-            pass # TODO if no album put modify image as ok!!!!
+            # TODO update in previous procedure list of files present 
+            #self.load_syncro_image_album(
+            #    cr, uid, album_ids, context=context)
+        #else:            
+        #    pass # TODO if no album put modify image as ok!!!!
         
         # TODO change position but only with currect redimension update 
         # in ok (now all!!)
-        image_ids = self.search(cr, uid, [
-            ('status', '=', 'modify')], context=context)
-        self.write(cr, uid, image_ids, {
-            'status': 'ok',
-            }, context=context)    
+        #image_ids = self.search(cr, uid, [
+        #    ('status', '=', 'modify')], context=context)
+        #self.write(cr, uid, image_ids, {
+        #    'status': 'ok',
+        #    }, context=context)    
         return True
     
     _columns = {
