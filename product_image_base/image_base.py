@@ -148,15 +148,14 @@ class ProductImageFile(orm.Model):
         # Pool used:
         album_pool = self.pool.get('product.image.album')
         
-        # Delete all images in calculated albums:
-        remove_ids = self.search(cr, uid, [
-            ('album_id', 'in', album_ids)], context=context)
-        if remove_ids:    
-            self.unlink(cr, uid, remove_ids, context=context)
-            
-        not_updated_ids = []
-        forced_album = []
+        not_updated_ids = [] # record image that raise error on update
+        forced_album_ids = [] # forced album list
         for album in album_pool.browse(cr, uid, album_ids, context=context):
+            # Load file name for check write / create operations:
+            album_filename = {} # reset every album
+            for image in album.image_ids:
+                album_filename[image.filename] = image.id
+
             origin = album.album_id # readability
             redimension_type = album.redimension_type # XXX max for now
             
@@ -170,7 +169,8 @@ class ProductImageFile(orm.Model):
             # Loop on all modified photos:
             for image in origin.image_ids:
                 if album.force_reload:
-                    forced_album.append(album.id)
+                    if album.id not in forced_album_ids:
+                        forced_album_ids.append(album.id)
                     if image.status not in ('modify', 'ok'):
                         continue # jump error images
                 else:        
@@ -178,10 +178,11 @@ class ProductImageFile(orm.Model):
                         continue # jump if not modified or error                    
                          
                 # Files name:
+                filename = image.filename
                 file_in = os.path.join(
-                    os.path.expanduser(origin.path), image.filename)
+                    os.path.expanduser(origin.path), filename)
                 file_out = os.path.join(
-                    os.path.expanduser(album.path), image.filename)
+                    os.path.expanduser(album.path), filename)
 
                 try:
                     img = Image.open(file_in)
@@ -200,10 +201,11 @@ class ProductImageFile(orm.Model):
                         
                     # Filters: NEAREST BILINEAR BICUBIC ANTIALIAS  
                     new_img.save(file_out, 'JPEG') # TODO change output!!!!
+                    _logger.info('Redim: %s [max: %s]' % (filename, max_px))
                     
                     # Write record:
                     data = {
-                        'filename': image.filename,
+                        'filename': filename,
                         'album_id': album.id, # new album
                         'timestamp': image.timestamp,
                         'product_id': image.product_id.id, 
@@ -211,17 +213,26 @@ class ProductImageFile(orm.Model):
                         'variant': image.variant,
                         'variant_code': image.variant_code,
                         'status': 'ok',
-                        'width': width,
-                        'height': height,
+                        'width': new_width,
+                        'height': new_height,
                         }
-                    self.create(cr, uid, data, context=context)
+                    if filename in album_filename:
+                        self.write(
+                            cr, uid, album_filename[filename], data, 
+                            context=context)
+                    else:
+                        self.create(cr, uid, data, context=context)
                 except:
                     _logger.error('Cannot create thumbnail for %s' % file_in)
                     not_updated_ids.append(image.id)
                     continue
-        # Reset force check after recalculation            
-        album_pool.write(cr, uid, forced_album, {
-            'force_reload': False}, context=context)         
+                    
+        # Reset force check after recalculation   
+        if forced_album_ids:
+            album_pool.write(cr, uid, forced_album_ids, {
+                'force_reload': False}, context=context)         
+            _logger.warning(
+                'Forced album done, reset check # %s' % len(forced_album_ids))
         return not_updated_ids
                     
     # -------------------------------------------------------------------------
@@ -344,19 +355,22 @@ class ProductImageFile(orm.Model):
             ('schedule_load', '=', True),
             ], context=context)
 
-        import pdb; pdb.set_trace()
         if album_ids:
-            # Recalculate images:
+            # Recalculate images:            
             not_updated_ids = self.calculate_syncro_image_album(
                 cr, uid, album_ids, context=context)
         else:
-            # Set all images as ok not modify:
-            modify_ids = self.search(cr, uid, [
-                ('status', '=', 'modify')], context=context)    
-            if modify_ids:    
-                self.write(cr, uid, modify_ids, {
-                    'status': 'ok',
-                    }, context=context)        
+            not_updated_ids = []        
+
+        # Set all images as ok not modify (except error convert):
+        modify_ids = self.search(cr, uid, [
+            ('status', '=', 'modify'), # only modify files
+            ('id', 'not in', not_updated_ids), # only files right converted
+            ], context=context)    
+        if modify_ids:    
+            self.write(cr, uid, modify_ids, {
+                'status': 'ok',
+                }, context=context)        
         return True
     
     _columns = {
