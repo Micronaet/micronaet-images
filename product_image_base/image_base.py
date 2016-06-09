@@ -143,11 +143,17 @@ class ProductImageFile(orm.Model):
     def calculate_syncro_image_album(self, cr, uid, album_ids, context=None):
         ''' Calculate image for the album depend on parent album, only for
             modify elements
+            @return: error images not updated
         '''
         # Pool used:
         album_pool = self.pool.get('product.image.album')
         
-        modify2ok_list = []
+        # Delete all images in calculated albums:
+        remove_ids = self.search(cr, uid, [
+            ('album_id', 'in', album_ids)], context=context)
+        self.unlink(cr, uid, remove_ids, context=context)
+            
+        not_updated_ids = []
         for album in album_pool.browse(cr, uid, album_ids, context=context):
             origin = album.album_id # readability
             redimension_type = album.redimension_type # XXX max for now
@@ -191,17 +197,27 @@ class ProductImageFile(orm.Model):
                         
                     # Filters: NEAREST BILINEAR BICUBIC ANTIALIAS  
                     new_img.save(file_out, 'JPEG') # TODO change output!!!!
-                    if image.status == 'modify':
-                        modify2ok_list.append(image.id)
+                    
+                    # Write record:
+                    data = {
+                        'filename': image.filename,
+                        'album_id': album.id, # new album
+                        'timestamp': image.timestamp,
+                        'product_id': image.product_id.id, 
+                        'extension': image.extension,
+                        'variant': image.variant,
+                        'variant_code': image.variant_code,
+                        'status': 'ok',
+                        #'width': fields.integer('Width px.'),
+                        #'height': fields.integer('Height px.'),
+                        }
+                    self.create(cr, uid, data, context=context)
                 except:
                     _logger.error('Cannot create thumbnail for %s' % file_in)
+                    not_updated_ids.append(image.id)
                     continue
                  
-            # TODO better update here list of files (not with extra procedure) 
-            self.write(cr, uid, modify2ok_list, {
-                'status': 'ok',
-                }, context=context)
-        return True
+        return not_updated_ids
                     
     # -------------------------------------------------------------------------
     #                             FOLDER IMAGE ALBUM:
@@ -325,7 +341,7 @@ class ProductImageFile(orm.Model):
 
         if album_ids:
             # Recalculate images:
-            self.calculate_syncro_image_album(
+            not_updated_ids = self.calculate_syncro_image_album(
                 cr, uid, album_ids, context=context)
         else:
             # Set all images as ok not modify:
