@@ -151,9 +151,11 @@ class ProductImageFile(orm.Model):
         # Delete all images in calculated albums:
         remove_ids = self.search(cr, uid, [
             ('album_id', 'in', album_ids)], context=context)
-        self.unlink(cr, uid, remove_ids, context=context)
+        if remove_ids:    
+            self.unlink(cr, uid, remove_ids, context=context)
             
         not_updated_ids = []
+        forced_album = []
         for album in album_pool.browse(cr, uid, album_ids, context=context):
             origin = album.album_id # readability
             redimension_type = album.redimension_type # XXX max for now
@@ -168,6 +170,7 @@ class ProductImageFile(orm.Model):
             # Loop on all modified photos:
             for image in origin.image_ids:
                 if album.force_reload:
+                    forced_album.append(album.id)
                     if image.status not in ('modify', 'ok'):
                         continue # jump error images
                 else:        
@@ -208,15 +211,17 @@ class ProductImageFile(orm.Model):
                         'variant': image.variant,
                         'variant_code': image.variant_code,
                         'status': 'ok',
-                        #'width': fields.integer('Width px.'),
-                        #'height': fields.integer('Height px.'),
+                        'width': width,
+                        'height': height,
                         }
                     self.create(cr, uid, data, context=context)
                 except:
                     _logger.error('Cannot create thumbnail for %s' % file_in)
                     not_updated_ids.append(image.id)
                     continue
-                 
+        # Reset force check after recalculation            
+        album_pool.write(cr, uid, forced_album, {
+            'force_reload': False}, context=context)         
         return not_updated_ids
                     
     # -------------------------------------------------------------------------
@@ -339,6 +344,7 @@ class ProductImageFile(orm.Model):
             ('schedule_load', '=', True),
             ], context=context)
 
+        import pdb; pdb.set_trace()
         if album_ids:
             # Recalculate images:
             not_updated_ids = self.calculate_syncro_image_album(
