@@ -573,6 +573,7 @@ class ProductProductImage(osv.osv):
         ''' Get image from context parameter
             >> album_id
         '''
+        # TODO manage variants?
         context = context or {}
         
         product_campaign_pool = self.pool.get('product.image.file')
@@ -590,6 +591,7 @@ class ProductProductImage(osv.osv):
             ('album_id', '=', album_id), # current album
             ('product_id', 'in', ids), # only selected product
             ('status', 'in', ('ok', 'modify')), # only correct images
+            ('variant', '=', False), # Master image
             ], context=context)
 
         product_fullname = {}
