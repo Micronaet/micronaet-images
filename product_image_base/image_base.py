@@ -102,6 +102,17 @@ class ProductImageFile(orm.Model):
     # -----------------
     # Utility function:
     # -----------------
+    #def get_album_product_image(self, cr, uid, album_id, product_id, 
+    #        context=None):
+    #    ''' Read and return image in album for product passed
+    #    '''
+    #    product_ids = self.search(cr, uid, [
+    #        ('album_id', '=', album_id),
+    #        ('product_id', '=', product_id),
+    #        ], context=context)
+    #        
+    #    return True
+        
     def get_default_code(self, filename):
         ''' Function that extract default_code from filename)
         '''
@@ -520,8 +531,42 @@ class ProductProductImage(osv.osv):
         return self._get_product_image_list(
             cr, uid, ids, album_id, context=None)    
 
+    def _get_product_image_context(self, cr, uid, ids, field_name, arg, 
+            context=None):
+        ''' Get image from context parameter
+            >> album_id
+        '''
+        context = context or {}
+        res = dict.fromkeys(ids, False)
+        album_id = context.get('album_id', False)
+        if not album_id:
+            return res
+
+        # Read all image file in product selected
+        product_ids = self.search(cr, uid, [
+            ('album_id', '=', album_id),
+            ('product_id', 'in', ids),
+            ], context=context)
+            
+        product_filename = {}
+        for item in self.browse(cr, uid, product_ids, context=context):
+            product_filename[item.product_id.id] = item.filename
+        
+        for product_id in ids:
+            if product_id not in product_filename:
+                continue # no photo in database
+                
+            (filename, header) = urllib.urlretrieve(
+                product_filename[product_id])
+            f = open(filename , 'rb')
+            res[product_id] = base64.encodestring(f.read())
+            f.close()
+
     _columns = {
         'product_image_quotation': fields.function(
             _get_product_image_quotation, type='binary', method=True),
+        'product_image_context': fields.function(
+            _get_product_image_context, type='binary', method=True,
+            help='Image loaded from album passed in context album_id param.'),
         }        
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
