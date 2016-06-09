@@ -546,10 +546,13 @@ class ProductProductImage(osv.osv):
         if not album_id:
             return res
 
-        # Read all image file in product selected
+        # TODO Load from file?
+        
+        # Read all image file in product selected        
         product_ids = product_campaign_pool.search(cr, uid, [
-            ('album_id', '=', album_id),
-            ('product_id', 'in', ids),
+            ('album_id', '=', album_id), # current album
+            ('product_id', 'in', ids), # only selected product
+            ('status', 'in', ('ok', 'modify')), # only correct images
             ], context=context)
             
         product_filename = {}
@@ -563,7 +566,7 @@ class ProductProductImage(osv.osv):
                 
             (filename, header) = urllib.urlretrieve(
                 product_filename[product_id])
-            f = open(filename , 'rb')
+            f = open(filename, 'rb')
             res[product_id] = base64.encodestring(f.read())
             f.close()
 
