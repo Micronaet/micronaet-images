@@ -554,7 +554,7 @@ class ProductProductImage(osv.osv):
             ('product_id', 'in', ids), # only selected product
             ('status', 'in', ('ok', 'modify')), # only correct images
             ], context=context)
-            
+
         product_filename = {}
         for item in product_campaign_pool.browse(
                 cr, uid, product_ids, context=context):
