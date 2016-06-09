@@ -323,24 +323,18 @@ class ProductImageFile(orm.Model):
             ('schedule_load', '=', True),
             ], context=context)
 
-        if album_ids:    
+        if album_ids:
+            # Recalculate images:
             self.calculate_syncro_image_album(
                 cr, uid, album_ids, context=context)
-            
-            # B. Reload all image in child album:
-            # TODO update in previous procedure list of files present 
-            #self.load_syncro_image_album(
-            #    cr, uid, album_ids, context=context)
-        #else:            
-        #    pass # TODO if no album put modify image as ok!!!!
-        
-        # TODO change position but only with currect redimension update 
-        # in ok (now all!!)
-        #image_ids = self.search(cr, uid, [
-        #    ('status', '=', 'modify')], context=context)
-        #self.write(cr, uid, image_ids, {
-        #    'status': 'ok',
-        #    }, context=context)    
+        else:
+            # Set all images as ok not modify:
+            modify_ids = self.search(cr, uid, [
+                ('status', '=', 'modify')], context=context)    
+            if modify_ids:    
+                self.write(cr, uid, modify_ids, {
+                    'status': 'ok',
+                    }, context=context)        
         return True
     
     _columns = {
