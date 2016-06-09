@@ -494,6 +494,7 @@ class ProductProductImage(osv.osv):
             context parameters:
                 'product_image': image code to open, ex.: QUOTATION (default)
         '''
+        # TODO rewrite bettere and decide how optimize
         context = context or {}
         # TODO add test for load image or not depend on user setting or report
             
