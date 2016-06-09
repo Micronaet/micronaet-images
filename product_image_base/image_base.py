@@ -543,6 +543,7 @@ class ProductProductImage(osv.osv):
         
         res = dict.fromkeys(ids, False)
         album_id = context.get('album_id', False)
+
         if not album_id:
             return res
 
@@ -555,20 +556,29 @@ class ProductProductImage(osv.osv):
             ('status', 'in', ('ok', 'modify')), # only correct images
             ], context=context)
 
-        product_filename = {}
+        product_fullname = {}
         for item in product_campaign_pool.browse(
                 cr, uid, product_ids, context=context):
-            product_filename[item.product_id.id] = item.filename
-        
+            product_fullname[item.product_id.id] = os.path.expanduser(
+                os.path.join(
+                    item.album_id.path,
+                    item.filename,
+                    ))
+
         for product_id in ids:
-            if product_id not in product_filename:
+            if product_id not in product_fullname:
                 continue # no photo in database
-                
-            (filename, header) = urllib.urlretrieve(
-                product_filename[product_id])
-            f = open(filename, 'rb')
-            res[product_id] = base64.encodestring(f.read())
-            f.close()
+            try:    
+                fullname = product_fullname[product_id]
+                (filename, header) = urllib.urlretrieve(
+                    fullname)
+                f = open(filename, 'rb')
+                res[product_id] = base64.encodestring(f.read())
+                f.close()
+            except:
+                _logger.error('Cannot load: %s' % fullname)
+                pass # no image    
+        return res            
 
     _columns = {
         'product_image_quotation': fields.function(
