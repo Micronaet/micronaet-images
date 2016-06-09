@@ -147,9 +147,10 @@ class ProductImageFile(orm.Model):
         # Pool used:
         album_pool = self.pool.get('product.image.album')
         
+        modify2ok_list = []
         for album in album_pool.browse(cr, uid, album_ids, context=context):
-            origin = album.album_id
-            redimension_type = album.redimension_type
+            origin = album.album_id # readability
+            redimension_type = album.redimension_type # XXX max for now
             
             # TODO for now used max
             if redimension_type != 'max':
@@ -166,13 +167,12 @@ class ProductImageFile(orm.Model):
                 else:        
                     if image.status != 'modify':
                         continue # jump if not modified or error                    
-                            
+                         
+                # Files name:
                 file_in = os.path.join(
-                    os.path.expanduser(origin.path), 
-                    image.filename)
+                    os.path.expanduser(origin.path), image.filename)
                 file_out = os.path.join(
-                    os.path.expanduser(album.path),
-                    image.filename)
+                    os.path.expanduser(album.path), image.filename)
 
                 try:
                     img = Image.open(file_in)
@@ -188,22 +188,19 @@ class ProductImageFile(orm.Model):
                     new_img = img.resize(
                         (new_width, new_height), 
                         Image.ANTIALIAS)
+                        
                     # Filters: NEAREST BILINEAR BICUBIC ANTIALIAS  
                     new_img.save(file_out, 'JPEG') # TODO change output!!!!
+                    if image.status == 'modify':
+                        modify2ok_list.append(image.id)
                 except:
                     _logger.error('Cannot create thumbnail for %s' % file_in)
                     continue
                  
             # TODO better update here list of files (not with extra procedure) 
-                            
-            #comando = "convert '%s' -geometry x%s '%s'" 
-            #%(os.path.join(cartella_in, nome_file), dimensione, 
-            #os.path.join(cartella_out, nome_file))
-            #os.system(comando) # lo lancio
-            #s = img.size()
-            #ratio = MAXWIDTH / s[0]
-            #newimg = img.resize(
-            #   (s[0] * ratio, s[1] * ratio), Image.ANTIALIAS)'''
+            self.write(cr, uid, modify2ok_list, {
+                'status': 'ok',
+                }, context=context)
         return True
                     
     # -------------------------------------------------------------------------
@@ -367,7 +364,7 @@ class ProductImageFile(orm.Model):
             ('format', 'Wrong format'),
             ('product', 'No product'),
             ], 'status'),
-        # TODO file image binary         
+        # TODO file image binary   
         }
         
     _defaults = {
@@ -416,6 +413,10 @@ class ProductProductImage(osv.osv):
     '''
     _inherit = 'product.product'
      
+    # -------------------------------------------------------------------------
+    #                              Utility:
+    # -------------------------------------------------------------------------
+    # TODO removeable?
     def _get_product_image_list(
             self, cr, uid, ids, album_id, context=None):
         ''' Return list of product and image for album_id passed
@@ -488,6 +489,10 @@ class ProductProductImage(osv.osv):
                     break # no more elements (found first)
         return res
 
+    # -------------------------------------------------------------------------
+    #                           Function fields:
+    # -------------------------------------------------------------------------
+    # product_image_quotation:
     def _get_product_image_quotation(self, cr, uid, ids, field_name, arg, 
             context=None):
         ''' Search album for quotation picture in config and return list:
@@ -532,6 +537,7 @@ class ProductProductImage(osv.osv):
         return self._get_product_image_list(
             cr, uid, ids, album_id, context=None)    
 
+    # product_image_context:
     def _get_product_image_context(self, cr, uid, ids, field_name, arg, 
             context=None):
         ''' Get image from context parameter
