@@ -537,19 +537,23 @@ class ProductProductImage(osv.osv):
             >> album_id
         '''
         context = context or {}
+        
+        product_campaign_pool = self.pool.get('product.image.file')
+        
         res = dict.fromkeys(ids, False)
         album_id = context.get('album_id', False)
         if not album_id:
             return res
 
         # Read all image file in product selected
-        product_ids = self.search(cr, uid, [
+        product_ids = product_campaign_pool.search(cr, uid, [
             ('album_id', '=', album_id),
             ('product_id', 'in', ids),
             ], context=context)
             
         product_filename = {}
-        for item in self.browse(cr, uid, product_ids, context=context):
+        for item in product_campaign_pool.browse(
+                cr, uid, product_ids, context=context):
             product_filename[item.product_id.id] = item.filename
         
         for product_id in ids:
