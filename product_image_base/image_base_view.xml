@@ -185,6 +185,26 @@
     </record>
  
     <!--product.product-->
+    <record model="ir.ui.view" id="view_product_product_chec_search">
+        <field name="name">product.product.check.image.tree</field>
+        <field name="model">product.product</field>
+        <field name="arch" type="xml">
+            <search string="Product image search" version="7.0">        
+                <field name="name" />
+                <field name="default_code" />
+
+                <!--<field name="name" filter_domain="[('partner_id','=',self)]"/>TODO family_id-->
+                
+                <filter name="no_ean" string="No EAN" domain="[('ean13','=',False)]"/>
+                <filter name="no_code" string="No code" domain="[('default_code','=',False)]"/>                    
+                
+                <group expand="0" string="Group By">
+                    <filter string="UOM" name="group_uom" context="{'group_by': 'uom_id'}" />
+                    <filter string="Category" name="group_categ" context="{'group_by': 'categ_id'}" />
+                </group>                
+             </search>
+        </field>
+    </record>
     <record model="ir.ui.view" id="view_product_product_check_tree">
         <field name="name">product.product.check.image.tree</field>
         <field name="model">product.product</field>
@@ -208,6 +228,7 @@
         <field name="view_type">form</field>        
         <field name="view_mode">tree,form</field>        
         <field name="view_id" ref="view_product_product_check_tree"/>
+        <field name="search_view_id" ref="view_product_product_chec_search"/>
         <field name="help">Product with images</field>
     </record>
     
