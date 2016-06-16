@@ -149,6 +149,7 @@
                         <field name="max_height" />
                         <field name="max_width" />
 
+                        <field name="check_image" attrs="{'invisible':[('calculated','=',True)]}"/>
 
                         <notebook colspan="4">
                             <page string="File" >
@@ -182,7 +183,34 @@
         <field name="view_mode">tree,form</field>        
         <field name="help">Folder where are stored images</field>
     </record>
-
+ 
+    <!--product.product-->
+    <record model="ir.ui.view" id="view_product_product_check_tree">
+        <field name="name">product.product.check.image.tree</field>
+        <field name="model">product.product</field>
+        <field name="arch" type="xml">
+            <tree string="Product check image">
+                <field name="name" />
+                <field name="default_code" />
+                <field name="uom_id" />
+                <field name="ean13" />
+                <field name="height" />
+                <field name="width" />
+                <field name="length" />
+                <!--<field name="statistic_category" />-->
+                <field name="album_ids" widget="many2many_tags"/>                
+            </tree>
+        </field>
+    </record>
+    <record id="product_product_check_image_action" model="ir.actions.act_window">
+        <field name="name">Product check image</field>
+        <field name="res_model">product.product</field>
+        <field name="view_type">form</field>        
+        <field name="view_mode">tree,form</field>        
+        <field name="view_id" ref="view_product_product_check_tree"/>
+        <field name="help">Product with images</field>
+    </record>
+    
     <menuitem action="product_product_image_album_action" 
               id="product_product_image_album_action_menu" 
               parent="base.menu_product" 
@@ -191,6 +219,10 @@
                   id="product_product_image_file_action_menu" 
                   parent="product_product_image_album_action_menu" 
                   sequence="10" />
+        <menuitem action="product_product_check_image_action" 
+                  id="product_product_check_image_file_menu" 
+                  parent="product_product_image_album_action_menu" 
+                  sequence="20" />
     </data>
 </openerp>
 

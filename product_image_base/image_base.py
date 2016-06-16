@@ -412,6 +412,9 @@ class ProductImageAlbumCalculated(orm.Model):
         # -------------------
         'calculated': fields.boolean('Calculated', 
             help='Folder is calculated from another images'),
+        'check_image': fields.boolean('Used for check image', 
+            help='Check if this album will be insert in report for check'
+                'image presence for product'),
         'album_id': fields.many2one(
             'product.image.album', 'Parent album', 
             domain=[('calculated', '=', False)]),
@@ -618,11 +621,33 @@ class ProductProductImage(osv.osv):
                 pass # no image    
         return res            
 
+
+    def _compute_lines_album(self, cr, uid, ids, name, args, context=None):
+        ''' return list of album for that product
+        '''
+        res = {}
+        for product in self.browse(cr, uid, ids, context=context):
+            res[product.id] = []
+            for image in product.image_ids:
+                if image.variant:
+                    continue # album are only for default image (no variant)
+                album_id = image.album_id.id
+                if album_id not in res[product.id]:
+                    res[product.id].append(album_id)
+        return res
+
     _columns = {
         'product_image_quotation': fields.function(
             _get_product_image_quotation, type='binary', method=True),
         'product_image_context': fields.function(
             _get_product_image_context, type='binary', method=True,
             help='Image loaded from album passed in context album_id param.'),
-        }        
+            
+        # Check image presence:
+        'image_ids': fields.one2many(
+            'product.image.file', 'product_id', 'Product'),     
+        'album_ids': fields.function(_compute_lines_album, 
+            relation='product.image.album', type='many2many', string='Album',
+            help='List of album for presence'),
+        }
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
