@@ -198,10 +198,10 @@
                 <filter name="no_ean" string="No EAN" domain="[('ean13','=',False)]"/>
                 <filter name="no_code" string="No code" domain="[('default_code','=',False)]"/>                    
                 
-                <group expand="0" string="Group By">
+                <!--<group expand="0" string="Group By">
                     <filter string="UOM" name="group_uom" context="{'group_by': 'uom_id'}" />
                     <filter string="Category" name="group_categ" context="{'group_by': 'categ_id'}" />
-                </group>                
+                </group>-->
              </search>
         </field>
     </record>
