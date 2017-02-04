@@ -585,6 +585,7 @@ class ProductProductImage(osv.osv):
         album_id = context.get('album_id', False)
 
         if not album_id:
+            _logger.error('Call context image without pass album_id in ctx')
             return res
 
         # TODO Load from file?
@@ -615,6 +616,7 @@ class ProductProductImage(osv.osv):
                     fullname)
                 f = open(filename, 'rb')
                 res[product_id] = base64.encodestring(f.read())
+                _logger.info('Load image context: %s' % fullname)
                 f.close()
             except:
                 _logger.error('Cannot load: %s' % fullname)
