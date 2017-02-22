@@ -588,6 +588,8 @@ class ProductProductImage(osv.osv):
             _logger.error('Call context image without pass album_id in ctx')
             return res
 
+        _logger.info('Load image from album: %s' % album_id)
+
         # TODO Load from file?
         
         # Read all image file in product selected        
@@ -611,9 +613,11 @@ class ProductProductImage(osv.osv):
             if product_id not in product_fullname:
                 continue # no photo in database
             try:    
+                # TODO remove: vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
                 fullname = product_fullname[product_id]
                 (filename, header) = urllib.urlretrieve(
                     fullname)
+                # TODO remove ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^    
                 f = open(filename, 'rb')
                 res[product_id] = base64.encodestring(f.read())
                 _logger.info('Load image context: %s' % fullname)
