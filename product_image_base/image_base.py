@@ -578,7 +578,7 @@ class ProductProductImage(osv.osv):
         '''
         # TODO manage variants?
         context = context or {}
-        
+        import pdb; pdb.set_trace()
         product_campaign_pool = self.pool.get('product.image.file')
         
         res = dict.fromkeys(ids, False)
