@@ -587,7 +587,8 @@ class ProductProductImage(osv.osv):
             _logger.error('Call context image without pass album_id in ctx')
             return res
 
-        _logger.info('Load image from album: %s' % album_id)
+        _logger.info('Load image from album: %s product [%s]' % (
+            album_id, ids))
 
         # TODO Load from file?
         
