@@ -581,7 +581,14 @@ class ProductProductImage(osv.osv):
         product_campaign_pool = self.pool.get('product.image.file')
         
         res = dict.fromkeys(ids, False)
+
         album_id = context.get('album_id', False)
+        if not album_id:
+            album_code = context.get('album_code', False)
+            if album_code:
+                album_ids = self.pool.get('product.image.album').search(
+                    cr, uid, [('code', '=', album_code)], context=context)
+                album_id = album_ids[0]
 
         if not album_id:
             _logger.error('Call context image without pass album_id in ctx')
