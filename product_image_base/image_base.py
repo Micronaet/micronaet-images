@@ -576,7 +576,6 @@ class ProductProductImage(osv.osv):
         ''' Get image from context parameter
             >> album_id
         '''
-        import pdb; pdb.set_trace()
         # TODO manage variants?
         context = context or {}
         product_campaign_pool = self.pool.get('product.image.file')
