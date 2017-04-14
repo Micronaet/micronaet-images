@@ -608,7 +608,7 @@ class ProductProductImage(osv.osv):
             ], context=context)
         
         if not product_ids:
-            _logger.error('No context image, try reload database!)
+            _logger.error('No context image, try reload database!')
             
         product_fullname = {}
         for item in product_campaign_pool.browse(
