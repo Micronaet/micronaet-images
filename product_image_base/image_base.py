@@ -606,7 +606,10 @@ class ProductProductImage(osv.osv):
             ('status', 'in', ('ok', 'modify')), # only correct images
             ('variant', '=', False), # Master image
             ], context=context)
-
+        
+        if not product_ids:
+            _logger.error('No context image, try reload database!)
+            
         product_fullname = {}
         for item in product_campaign_pool.browse(
                 cr, uid, product_ids, context=context):
