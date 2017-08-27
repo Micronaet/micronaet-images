@@ -1,0 +1,431 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* product_image_base
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 8.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-07-27 16:31+0000\n"
+"PO-Revision-Date: 2017-08-16 15:20+0100\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: \n"
+"Language: it\n"
+"X-Generator: Poedit 1.6.10\n"
+
+#. module: product_image_base
+#: view:product.image.file:product_image_base.product_product_image_file_search_view
+#: field:product.image.file,album_id:0 field:product.product,album_ids:0
+msgid "Album"
+msgstr "Album"
+
+#. module: product_image_base
+#: view:product.image.album:product_image_base.product_product_image_album_form_view
+#: field:product.image.album,calculated:0
+msgid "Calculated"
+msgstr "Calcolato"
+
+#. module: product_image_base
+#: help:product.image.album,check_image:0
+msgid ""
+"Check if this album will be insert in report for checkimage presence for "
+"product"
+msgstr ""
+"Controlla se l'album sarà inserito nella stampa per controllo immagini "
+"presenza per prodotto"
+
+#. module: product_image_base
+#: view:product.image.album:product_image_base.product_product_image_album_form_view
+msgid "Clean album"
+msgstr "Pulisci album"
+
+#. module: product_image_base
+#: field:product.image.album,code:0
+msgid "Code"
+msgstr "Codice"
+
+#. module: product_image_base
+#: help:product.image.album,empty_image:0
+msgid "Complete name + ext. of empty image, ex.: 0.jpg"
+msgstr "Nome completo + estensione dell'immagine vuota, es.: 0.jpg"
+
+#. module: product_image_base
+#: field:product.image.album,create_uid:0
+#: field:product.image.file,create_uid:0
+msgid "Created by"
+msgstr "Creato da"
+
+#. module: product_image_base
+#: field:product.image.album,create_date:0
+#: field:product.image.file,create_date:0
+msgid "Created on"
+msgstr "Creato il"
+
+#. module: product_image_base
+#: field:product.image.album,empty_image:0
+msgid "Empty image"
+msgstr "Immagine vuota"
+
+#. module: product_image_base
+#: field:product.image.album,extension_image:0
+#: field:product.image.file,extension:0
+msgid "Extension"
+msgstr "Estensione"
+
+#. module: product_image_base
+#: view:product.image.album:product_image_base.product_product_image_album_form_view
+msgid "File"
+msgstr "File"
+
+#. module: product_image_base
+#: help:product.image.file,variant:0
+msgid "File format CODE-XXX.jpg where XXX is variant block"
+msgstr "Formato file CODICE-XXX.jpg dove XXX è la variante del blocco"
+
+#. module: product_image_base
+#: selection:product.image.file,status:0
+msgid "File modify"
+msgstr "File modificato"
+
+#. module: product_image_base
+#: selection:product.image.file,status:0
+msgid "File removed"
+msgstr "File rimosso"
+
+#. module: product_image_base
+#: field:product.image.file,filename:0
+msgid "Filename"
+msgstr "Nome file"
+
+#. module: product_image_base
+#: field:product.image.album,image_ids:0
+msgid "Files"
+msgstr "Files"
+
+#. module: product_image_base
+#: help:product.image.album,calculated:0
+msgid "Folder is calculated from another images"
+msgstr "La cartella è calcolata da altre immagini"
+
+#. module: product_image_base
+#: field:product.image.album,path:0
+msgid "Folder path"
+msgstr "Percorso cartella"
+
+#. module: product_image_base
+#: model:ir.actions.act_window,help:product_image_base.product_product_image_album_action
+msgid "Folder where are stored images"
+msgstr "Cartella dove sono depositate le immagini"
+
+#. module: product_image_base
+#: field:product.image.album,force_reload:0
+msgid "Force reload"
+msgstr "Forza ricaricamento"
+
+#. module: product_image_base
+#: help:product.image.album,force_reload:0
+msgid ""
+"Force reload will regenerate all images\n"
+"                (used when change dimension etc.)"
+msgstr ""
+"La forzatura del ricaricamento rigenera tutte le immagini\n"
+"(utilizzato quando ad esempio viene cambiata la dimensione ecc.)"
+
+#. module: product_image_base
+#: view:product.image.file:product_image_base.product_product_image_file_search_view
+msgid "Group By"
+msgstr "Raggruppa per"
+
+#. module: product_image_base
+#: field:product.image.album,has_variant:0
+msgid "Has variants"
+msgstr "Ha varianti"
+
+#. module: product_image_base
+#: field:product.image.album,height:0
+msgid "Height in px."
+msgstr "Altezza in px."
+
+#. module: product_image_base
+#: field:product.image.file,height:0
+msgid "Height px."
+msgstr "Altezza px."
+
+#. module: product_image_base
+#: field:product.image.album,id:0 field:product.image.file,id:0
+msgid "ID"
+msgstr "ID"
+
+#. module: product_image_base
+#: help:product.image.album,schedule_load:0
+msgid ""
+"If checked will load with schedule operation else still \n"
+"                have only the images present in this moment"
+msgstr ""
+"Se spuntato carica con una operazione schedulata altrimenti\n"
+"avrà le sole immagini presenti in questo momento"
+
+#. module: product_image_base
+#: model:ir.actions.act_window,name:product_image_base.product_product_image_album_action
+#: model:ir.model,name:product_image_base.model_product_image_album
+#: model:ir.ui.menu,name:product_image_base.product_product_image_album_action_menu
+#: view:product.image.album:product_image_base.product_product_image_album_form_view
+#: view:product.image.album:product_image_base.product_product_image_album_tree_view
+#: view:product.image.file:product_image_base.product_product_image_file_tree_readonly_view
+#: view:product.image.file:product_image_base.product_product_image_file_tree_view
+msgid "Image album"
+msgstr "Immagini album"
+
+#. module: product_image_base
+#: model:ir.actions.act_window,name:product_image_base.product_product_image_file_action
+#: model:ir.model,name:product_image_base.model_product_image_file
+#: model:ir.ui.menu,name:product_image_base.product_product_image_file_action_menu
+#: view:product.image.file:product_image_base.product_product_image_file_form_view
+#: view:product.image.file:product_image_base.product_product_image_file_search_view
+msgid "Image file"
+msgstr "File immagine"
+
+#. module: product_image_base
+#: help:product.product,product_image_context:0
+msgid "Image loaded from album passed in context album_id param."
+msgstr ""
+"Immagini caricate dall'album passato nel contesto con il parametro: album_id"
+
+#. module: product_image_base
+#: view:product.image.album:product_image_base.product_product_image_album_form_view
+msgid "Image no more found will be removed from this album list"
+msgstr "Immagine non trovata verrà rimossa da questa lista di album"
+
+#. module: product_image_base
+#: model:ir.actions.act_window,help:product_image_base.product_product_image_file_action
+msgid "Images file"
+msgstr "File immagini"
+
+#. module: product_image_base
+#: field:product.image.album,write_uid:0 field:product.image.file,write_uid:0
+msgid "Last Updated by"
+msgstr "Aggiornato da"
+
+#. module: product_image_base
+#: field:product.image.album,write_date:0
+#: field:product.image.file,write_date:0
+msgid "Last Updated on"
+msgstr "Aggiornato il"
+
+#. module: product_image_base
+#: help:product.product,album_ids:0
+msgid "List of album for presence"
+msgstr "Lista degli album per presenza"
+
+#. module: product_image_base
+#: field:product.image.album,max_height:0
+msgid "Max height in px."
+msgstr "Massima altezza in px."
+
+#. module: product_image_base
+#: selection:product.image.album,redimension_type:0
+msgid "Max large (lenght or width)"
+msgstr "Massima dimensione (lunghezza o larghezza)"
+
+#. module: product_image_base
+#: selection:product.image.album,redimension_type:0
+msgid "Max length"
+msgstr "Massima lunghezza"
+
+#. module: product_image_base
+#: field:product.image.album,max_px:0
+msgid "Max px."
+msgstr "Max px."
+
+#. module: product_image_base
+#: selection:product.image.album,redimension_type:0
+msgid "Max width"
+msgstr "Massima larghezza"
+
+#. module: product_image_base
+#: field:product.image.album,max_width:0
+msgid "Max width in px."
+msgstr "Max larghezza in px."
+
+#. module: product_image_base
+#: view:product.image.file:product_image_base.product_product_image_file_search_view
+msgid "Modified"
+msgstr "Modificato"
+
+#. module: product_image_base
+#: field:product.image.album,name:0
+msgid "Name"
+msgstr "Nome"
+
+#. module: product_image_base
+#: help:product.image.album,upper_code:0
+msgid "Name is code in upper case: abc10 >> ABC10.png"
+msgstr "Il codice del nome deve essere maiuscolo: abc10 >> ABC10.png"
+
+#. module: product_image_base
+#: view:product.product:product_image_base.view_product_product_chec_search
+msgid "No EAN"
+msgstr "Nessun EAN"
+
+#. module: product_image_base
+#: view:product.product:product_image_base.view_product_product_chec_search
+msgid "No code"
+msgstr "Nessun codice"
+
+#. module: product_image_base
+#: view:product.image.file:product_image_base.product_product_image_file_search_view
+#: selection:product.image.file,status:0
+msgid "No product"
+msgstr "Nessun prodotto"
+
+#. module: product_image_base
+#: selection:product.image.file,status:0
+msgid "OK"
+msgstr "OK"
+
+#. module: product_image_base
+#: view:product.image.album:product_image_base.product_product_image_album_form_view
+msgid "Origin"
+msgstr "Origine"
+
+#. module: product_image_base
+#: view:product.image.file:product_image_base.product_product_image_file_search_view
+msgid "Original"
+msgstr "Originale"
+
+#. module: product_image_base
+#: field:product.image.album,album_id:0
+msgid "Parent album"
+msgstr "Album padre"
+
+#. module: product_image_base
+#: help:product.image.album,parent_format:0
+msgid "Parent code list for product composition, ex.: 3|5"
+msgstr "Codice padre, lista per composizione prodotto, es.: 3|5"
+
+#. module: product_image_base
+#: field:product.image.album,parent_format:0
+msgid "Parent format"
+msgstr "Formato padre"
+
+#. module: product_image_base
+#: help:product.image.album,path:0
+msgid "Path folder, ex.: /home/admin/photo"
+msgstr "Cartella padre, es.: /home/admin/photo"
+
+#. module: product_image_base
+#: model:ir.model,name:product_image_base.model_product_product
+#: view:product.image.file:product_image_base.product_product_image_file_search_view
+#: field:product.image.file,product_id:0 field:product.product,image_ids:0
+msgid "Product"
+msgstr "Prodotto"
+
+#. module: product_image_base
+#: model:ir.actions.act_window,name:product_image_base.product_product_check_image_action
+#: model:ir.ui.menu,name:product_image_base.product_product_check_image_file_menu
+#: view:product.product:product_image_base.view_product_product_check_tree
+msgid "Product check image"
+msgstr "Controlla immagine prodotto"
+
+#. module: product_image_base
+#: view:product.product:product_image_base.view_product_product_chec_search
+msgid "Product image search"
+msgstr "Ricerca immagine prodotto"
+
+#. module: product_image_base
+#: model:ir.actions.act_window,help:product_image_base.product_product_check_image_action
+msgid "Product with images"
+msgstr "Prodotto con immagini"
+
+#. module: product_image_base
+#: field:product.image.album,redimension_type:0
+msgid "Redimension type"
+msgstr "Tipo ridimensionamento"
+
+#. module: product_image_base
+#: view:product.image.file:product_image_base.product_product_image_file_search_view
+msgid "Removed"
+msgstr "Rimossa"
+
+#. module: product_image_base
+#: field:product.image.album,schedule_load:0
+msgid "Schedule Load"
+msgstr "Schedulato caricamento"
+
+#. module: product_image_base
+#: view:product.image.file:product_image_base.product_product_image_file_search_view
+msgid "Status"
+msgstr "Stato"
+
+#. module: product_image_base
+#: field:product.image.file,timestamp:0
+msgid "Timestamp"
+msgstr "Time stamp"
+
+#. module: product_image_base
+#: field:product.image.album,upper_code:0
+msgid "Upper code"
+msgstr "Codice maiuscolo"
+
+#. module: product_image_base
+#: field:product.image.album,check_image:0
+msgid "Used for check image"
+msgstr "Utilizzato per controllo immagine"
+
+#. module: product_image_base
+#: help:product.image.album,code:0
+msgid "Used for setup configuration parameters"
+msgstr "Utilizzato per impostare i parametri di configurazione"
+
+#. module: product_image_base
+#: view:product.image.file:product_image_base.product_product_image_file_search_view
+#: field:product.image.file,variant:0
+msgid "Variant"
+msgstr "Variante"
+
+#. module: product_image_base
+#: field:product.image.file,variant_code:0
+msgid "Variant code"
+msgstr "Codice variante"
+
+#. module: product_image_base
+#: field:product.image.album,width:0
+msgid "Width in px."
+msgstr "Larghezza in px."
+
+#. module: product_image_base
+#: field:product.image.file,width:0
+msgid "Width px."
+msgstr "Larghezza px."
+
+#. module: product_image_base
+#: help:product.image.album,extension_image:0
+#: help:product.image.file,extension:0
+msgid "Without dot, for ex.: jpg"
+msgstr "Senza il punto, per esempio: jpg"
+
+#. module: product_image_base
+#: view:product.image.file:product_image_base.product_product_image_file_search_view
+#: selection:product.image.file,status:0
+msgid "Wrong format"
+msgstr "Formato errato"
+
+#. module: product_image_base
+#: help:product.image.album,has_variant:0
+msgid "ex. for code P1010 variant 001: P1010-001.jpg"
+msgstr "es. per codice P1010 variante 001: P1010-001.jpg"
+
+#. module: product_image_base
+#: field:product.image.file,status:0
+msgid "status"
+msgstr "stato"
+
+#. module: product_image_base
+#: field:product.product,product_image_context:0
+#: field:product.product,product_image_quotation:0
+msgid "unknown"
+msgstr "sconosciuto"
