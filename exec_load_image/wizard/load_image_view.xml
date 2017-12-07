@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+    <data>
+       <!-- ir.cron.force.image.wizard -->
+       <record id="ir_cron_force_image_wizard_view" model="ir.ui.view">
+            <field name="name">ir.cron.force.image.wizard</field>
+            <field name="model">ir.cron.force.image.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Wizard" version="7.0">
+                   <sheet>
+                       <button string="Cancel" special="cancel" />
+                       <button name="action_force" string="Forza" type="object" icon="gtk-jump-to" class="oe_highlight" />
+                   </sheet>                   
+                </form>
+            </field>
+      </record>
+      <record model="ir.actions.act_window" id="action_ir_cron_force_image_wizard_view">
+          <field name="name">Forza caricamento immagini</field>
+          <field name="res_model">ir.cron.force.image.wizard</field>
+          <field name="view_type">form</field>
+          <field name="view_mode">form</field>
+          <field name="target">new</field>
+          <field name="view_id" ref="ir_cron_force_image_wizard_view"/>
+      </record>      
+      <menuitem 
+          parent="product_image_base.product_product_image_album_action_menu" 
+          id="menu_ir_cron_force_image_wizard_view" 
+          action="action_ir_cron_force_image_wizard_view"
+          sequence="90"
+          />
+    </data>
+</openerp>
