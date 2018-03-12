@@ -264,7 +264,7 @@ class ProductImageFile(orm.Model):
             for root, directories, files in os.walk(path):
                 for filename in files:
                     if filename.startswith('._'):
-                        _logger.warning('Jump temp file: %s' % filename
+                        _logger.warning('Jump temp file: %s' % filename)
                         continue
                         
                     fullname = os.path.join(root, filename)                
