@@ -263,6 +263,10 @@ class ProductImageFile(orm.Model):
             # Read all files in folder:
             for root, directories, files in os.walk(path):
                 for filename in files:
+                    if filename.startswith('._'):
+                        _logger.warning('Jump temp file: %s' % filename
+                        continue
+                        
                     fullname = os.path.join(root, filename)                
                     timestamp = '%s' % os.path.getmtime(fullname)
                     default_code, variant, extension = self.get_default_code(
