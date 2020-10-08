@@ -214,9 +214,9 @@
                 <field name="default_code" />
                 <field name="uom_id" />
                 <field name="ean13" />
-                <field name="height" />
+                <!--<field name="height" />
                 <field name="width" />
-                <field name="length" />
+                <field name="length" />-->
                 <!--<field name="statistic_category" />-->
                 <field name="album_ids" widget="many2many_tags"/>                
             </tree>

@@ -120,13 +120,13 @@ class ProductImageFile(orm.Model):
         block = filename.split('.')
         if len(block) == 2:
             return (
-                block[0].replace('_', ' '),
+                block[0].rstrip('_').replace('_', ' '),
                 False,
                 block[1]
                 )
         if len(block) == 3: # variant 
             return (
-                block[0].replace('_', ' '),
+                block[0].rstrip('_').replace('_', ' '),
                 block[1],                
                 block[2],
                 )
