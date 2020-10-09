@@ -37,7 +37,7 @@ from openerp.tools import (DEFAULT_SERVER_DATE_FORMAT,
     DEFAULT_SERVER_DATETIME_FORMAT,
     DATETIME_FORMATS_MAP,
     float_compare)
-
+import pdb
 
 _logger = logging.getLogger(__name__)
 
@@ -60,12 +60,16 @@ class ProductImageAlbum(orm.Model):
         return image_pool.unlink(cr, uid, image_ids, context=context)
 
     _columns = {
-        'code': fields.char('Code', size=10, required=True,
+        'code': fields.char(
+            'Code', size=10, required=True,
             help='Used for setup configuration parameters'),
-        'name': fields.char('Name', size=64, required=True),
-        'path': fields.char('Folder path', size=128, required=True,
+        'name': fields.char(
+            'Name', size=64, required=True),
+        'path': fields.char(
+            'Folder path', size=128, required=True,
             help='Path folder, ex.: /home/admin/photo'),
-        'parent_format': fields.char('Parent format', size=60,
+        'parent_format': fields.char(
+            'Parent format', size=60,
             help='Parent code list for product composition, ex.: 3|5'),
         'extension_image': fields.char(
             'Extension', size=10, required=True,
@@ -275,6 +279,8 @@ class ProductImageFile(orm.Model):
 
                     fullname = os.path.join(root, filename)
                     timestamp = '%s' % os.path.getmtime(fullname)
+                    if filename.startswith('129TX ANTA'):
+                        pdb.set_trace()
                     default_code, variant, extension = self.get_default_code(
                         filename)
 
@@ -441,7 +447,7 @@ class ProductImageAlbumCalculated(orm.Model):
         'redimension_type': fields.selection([
             ('length', 'Max length'),
             ('width', 'Max width'),
-            ('max', 'Max large (lenght or width)'),
+            ('max', 'Max large (length or width)'),
             ], 'Redimension type'),
 
         # ----------------------
