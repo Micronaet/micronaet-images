@@ -428,7 +428,7 @@ class ProductImageAlbumCalculated(orm.Model):
         'check_image': fields.boolean(
             'Used for check image',
             help='Check if this album will be insert in report for check'
-                'image presence for product'),
+                 'image presence for product'),
         'album_id': fields.many2one(
             'product.image.album', 'Parent album',
             domain=[('calculated', '=', False)]),
