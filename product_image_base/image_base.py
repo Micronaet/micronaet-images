@@ -158,16 +158,16 @@ class ProductImageFile(orm.Model):
         # Pool used:
         album_pool = self.pool.get('product.image.album')
 
-        not_updated_ids = [] # record image that raise error on update
-        forced_album_ids = [] # forced album list
+        not_updated_ids = []  # record image that raise error on update
+        forced_album_ids = []  # forced album list
         for album in album_pool.browse(cr, uid, album_ids, context=context):
             # Load file name for check write / create operations:
             album_filename = {}  # reset every album
             for image in album.image_ids:
                 album_filename[image.filename] = image.id
 
-            origin = album.album_id # readability
-            redimension_type = album.redimension_type # XXX max for now
+            origin = album.album_id  # readability
+            redimension_type = album.redimension_type  # XXX max for now
 
             # TODO for now used max
             if redimension_type != 'max':
@@ -210,7 +210,7 @@ class ProductImageFile(orm.Model):
                         Image.ANTIALIAS)
 
                     # Filters: NEAREST BILINEAR BICUBIC ANTIALIAS
-                    new_img.save(file_out, 'JPEG') # TODO change output!!!!
+                    new_img.save(file_out, 'JPEG')  # TODO change output!!!!
                     _logger.info('Redim: %s [max: %s]' % (filename, max_px))
 
                     # Write record:
@@ -288,8 +288,9 @@ class ProductImageFile(orm.Model):
                         ('default_code', '=', default_code)], context=context)
                     if product_ids:
                         if len(product_ids) > 1:
-                            _logger.error('More than one product code: %s' % (
-                                default_code))
+                            _logger.error(
+                                'More than one product code: "%s"' %
+                                default_code)
                         product_id = product_ids[0]
                     else:
                         product_id = False
