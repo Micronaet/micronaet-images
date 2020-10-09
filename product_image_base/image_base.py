@@ -535,7 +535,7 @@ class ProductProductImage(osv.osv):
                         res[product.id] = image
                     else:
                         res[product.id] = img
-                    break # no more elements (found first)
+                    break  # no more elements (found first)
         return res
 
     # -------------------------------------------------------------------------
@@ -543,12 +543,12 @@ class ProductProductImage(osv.osv):
     # -------------------------------------------------------------------------
     # product_image_quotation:
     def _get_product_image_quotation(self, cr, uid, ids, field_name, arg,
-            context=None):
+                                     context=None):
         """ Search album for quotation picture in config and return list:
             context parameters:
                 'product_image': image code to open, ex.: QUOTATION (default)
         """
-        # TODO rewrite bettere and decide how optimize
+        # TODO rewrite better and decide how optimize
         context = context or {}
         # TODO add test for load image or not depend on user setting or report
 
@@ -588,7 +588,7 @@ class ProductProductImage(osv.osv):
 
     # product_image_context:
     def _get_product_image_context(self, cr, uid, ids, field_name, arg,
-            context=None):
+                                   context=None):
         """ Get image from context parameter
             >> album_id
         """
