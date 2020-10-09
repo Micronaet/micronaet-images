@@ -295,8 +295,8 @@ class ProductImageFile(orm.Model):
                         'product_id': product_id,
                         'extension': extension,
                         # Used?:
-                        #'width': fields.integer('Width px.'),
-                        #'height': fields.integer('Height px.'),
+                        # 'width': fields.integer('Width px.'),
+                        # 'height': fields.integer('Height px.'),
                         }
                     if variant:
                         data['variant'] = True
@@ -321,10 +321,10 @@ class ProductImageFile(orm.Model):
 
                         self.write(cr, uid, item_id, data, context=context)
 
-                    else: # Create (default modify)
+                    else:  # Create (default modify)
                         item_id = self.create(
                             cr, uid, data, context=context)
-                    #if item_id:
+                    # if item_id:
                     exist_ids.append(item_id) # after will force exist
 
         # Mark image no more present (for all albums):
@@ -334,7 +334,7 @@ class ProductImageFile(orm.Model):
             ], context=context)
         if not_exist_ids:
             self.write(cr, uid, not_exist_ids, {
-            'status': 'removed'}, context=context)
+                'status': 'removed'}, context=context)
         return True
 
     # -------------------------------------------------------------------------
@@ -357,9 +357,9 @@ class ProductImageFile(orm.Model):
             self.load_syncro_image_album(cr, uid, album_ids, context=context)
 
         # ---------------------------------
-        # Redimension child image in album:
+        # Resize child image in album:
         # ---------------------------------
-        # A. Redimension child calculated album:
+        # A. Resize child calculated album:
         album_ids = album_pool.search(cr, uid, [
             ('calculated', '=', True),
             ('schedule_load', '=', True),
@@ -387,7 +387,8 @@ class ProductImageFile(orm.Model):
         'filename': fields.char('Filename', size=60, required=True),
         'album_id': fields.many2one('product.image.album', 'Album'),
         'timestamp': fields.char('Timestamp', size=30),
-        'variant': fields.boolean('Variant',
+        'variant': fields.boolean(
+            'Variant',
             help='File format CODE-XXX.jpg where XXX is variant block'),
         'variant_code': fields.char('Variant code', size=5),
         'product_id': fields.many2one('product.product', 'Product'),
@@ -411,6 +412,7 @@ class ProductImageFile(orm.Model):
         'status': lambda *x: 'modify',
         }
 
+
 class ProductImageAlbumCalculated(orm.Model):
     """ Add fields for manage calculated folders
     """
@@ -418,11 +420,13 @@ class ProductImageAlbumCalculated(orm.Model):
 
     _columns = {
         # -------------------
-        # Redimension fields:
+        # Resize fields:
         # -------------------
-        'calculated': fields.boolean('Calculated',
+        'calculated': fields.boolean(
+            'Calculated',
             help='Folder is calculated from another images'),
-        'check_image': fields.boolean('Used for check image',
+        'check_image': fields.boolean(
+            'Used for check image',
             help='Check if this album will be insert in report for check'
                 'image presence for product'),
         'album_id': fields.many2one(
@@ -432,8 +436,9 @@ class ProductImageAlbumCalculated(orm.Model):
         # Dimension for calculating:
         'width': fields.integer('Width in px.'),
         'height': fields.integer('Height in px.'),
-        'max_px': fields.integer('Max px.'), # TODO
-        'redimension_type' :fields.selection([
+        'max_px': fields.integer(
+            'Max px.'),  # TODO
+        'redimension_type': fields.selection([
             ('length', 'Max length'),
             ('width', 'Max width'),
             ('max', 'Max large (lenght or width)'),
@@ -451,6 +456,7 @@ class ProductImageAlbumCalculated(orm.Model):
         'redimension_type:': lambda *x: 'max',
         }
 
+
 class ProductProductImage(osv.osv):
     """ Add extra function and fields for manage picture for product
     """
@@ -459,7 +465,7 @@ class ProductProductImage(osv.osv):
     # -------------------------------------------------------------------------
     #                              Utility:
     # -------------------------------------------------------------------------
-    # TODO removeable?
+    # TODO removable?
     def _get_product_image_list(
             self, cr, uid, ids, album_id, context=None):
         """ Return list of product and image for album_id passed
@@ -481,7 +487,7 @@ class ProductProductImage(osv.osv):
             cr, uid, album_id, context=context)
 
         image_path = os.path.expanduser(album_proxy.path)
-        #empty_image = os.path.join(image_path, album_proxy.empty_image)
+        # empty_image = os.path.join(image_path, album_proxy.empty_image)
         if not image_path:
             _logger.error('Path for album: %s not found!' % album_id)
             return res
@@ -496,7 +502,7 @@ class ProductProductImage(osv.osv):
                 code = code.upper()
             else:
                 code = code.lower()
-            code = code.replace(' ', '_') # no space in code
+            code = code.replace(' ', '_')  # no space in code
 
             # Prepare block elements:
             parent_block = [len(code)]
@@ -518,7 +524,7 @@ class ProductProductImage(osv.osv):
                     )
                 try:
                     (filename, header) = urllib.urlretrieve(image)
-                    f = open(filename , 'rb')
+                    f = open(filename, 'rb')
                     img = base64.encodestring(f.read())
                     f.close()
                 except:
