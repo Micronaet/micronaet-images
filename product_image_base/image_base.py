@@ -279,8 +279,6 @@ class ProductImageFile(orm.Model):
 
                     fullname = os.path.join(root, filename)
                     timestamp = '%s' % os.path.getmtime(fullname)
-                    if filename.startswith('129TX ANTA'):
-                        pdb.set_trace()
                     default_code, variant, extension = self.get_default_code(
                         filename)
 
