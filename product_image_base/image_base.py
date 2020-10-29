@@ -129,20 +129,24 @@ class ProductImageFile(orm.Model):
         # TODO test upper and test extension
         block = filename.split('.')
         if len(block) == 2:  # default product:
+            block0 = block[0]
+            if block0.endwith('_'):
+                block0 = '%s%%' % block[0].rstrip('_')  # Ends _ means % (all)
+            
             return (
-                block[0].rstrip('_').replace('_', ' '),
+                block0.replace('_', ' '),
                 False,
                 block[1]
                 )
         if len(block) == 3:  # variant:
             return (
-                block[0].rstrip('_').replace('_', ' '),
+                block0.replace('_', ' '),
                 block[1],
                 block[2],
                 )
         else:
             return (
-                block[0].rstrip('_').replace('_', ' '),
+                block0.replace('_', ' '),
                 False,
                 '',  # no extension when error
                 )
