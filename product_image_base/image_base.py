@@ -182,10 +182,10 @@ class ProductImageFile(orm.Model):
                     if album.id not in forced_album_ids:
                         forced_album_ids.append(album.id)
                     if image.status not in ('modify', 'ok'):
-                        continue # jump error images
+                        continue  # jump error images
                 else:
                     if image.status != 'modify':
-                        continue # jump if not modified or error
+                        continue  # jump if not modified or error
 
                 # Files name:
                 filename = image.filename
@@ -212,11 +212,17 @@ class ProductImageFile(orm.Model):
                     # Filters: NEAREST BILINEAR BICUBIC ANTIALIAS
                     new_img.save(file_out, 'JPEG')  # TODO change output!!!!
                     _logger.info('Redim: %s [max: %s]' % (filename, max_px))
+                except:
+                    _logger.error(
+                        'Cannot create thumbnail %s (jump image)' % file_in)
+                    not_updated_ids.append(image.id)
+                    continue
 
+                try:
                     # Write record:
                     data = {
                         'filename': filename,
-                        'album_id': album.id, # new album
+                        'album_id': album.id,  # new album
                         'timestamp': image.timestamp,
                         'product_id': image.product_id.id,
                         'extension': image.extension,
@@ -233,7 +239,7 @@ class ProductImageFile(orm.Model):
                     else:
                         self.create(cr, uid, data, context=context)
                 except:
-                    _logger.error('Cannot create thumbnail for %s' % file_in)
+                    _logger.error('Cannot insert image %s' % file_in)
                     not_updated_ids.append(image.id)
                     continue
 
@@ -658,7 +664,6 @@ class ProductProductImage(osv.osv):
                 pass # no image
         return res
 
-
     def _compute_lines_album(self, cr, uid, ids, name, args, context=None):
         """ return list of album for that product
         """
@@ -683,8 +688,8 @@ class ProductProductImage(osv.osv):
         # Check image presence:
         'image_ids': fields.one2many(
             'product.image.file', 'product_id', 'Product'),
-        'album_ids': fields.function(_compute_lines_album,
+        'album_ids': fields.function(
+            _compute_lines_album,
             relation='product.image.album', type='many2many', string='Album',
             help='List of album for presence'),
         }
-# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
