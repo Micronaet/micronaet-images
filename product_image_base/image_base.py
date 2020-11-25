@@ -263,6 +263,8 @@ class ProductImageFile(orm.Model):
 
         exist_ids = [] # for all albums
         for album in album_pool.browse(cr, uid, album_ids, context=context):
+            _logger.info('Loading album: %s' % album.name)
+            
             # Parameters:
             path = os.path.expanduser(album.path)
             extension_image = album.extension_image
