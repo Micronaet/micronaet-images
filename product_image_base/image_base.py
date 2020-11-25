@@ -161,6 +161,8 @@ class ProductImageFile(orm.Model):
         not_updated_ids = []  # record image that raise error on update
         forced_album_ids = []  # forced album list
         for album in album_pool.browse(cr, uid, album_ids, context=context):
+            _logger.info('Updating resized album: %s' % album.name)
+                    
             # Load file name for check write / create operations:
             album_filename = {}  # reset every album
             for image in album.image_ids:
@@ -171,6 +173,7 @@ class ProductImageFile(orm.Model):
 
             # TODO for now used max
             if redimension_type != 'max':
+                _logger.error('Resize if only for max parameter!')
                 continue
 
             # TODO change view
