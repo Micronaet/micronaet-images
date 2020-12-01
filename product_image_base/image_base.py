@@ -239,11 +239,11 @@ class ProductImageFile(orm.Model):
 
                     if square_image:
                         self.change_image_in_square(file_out)
-                        _logger.info('Redim: %s [max: %s]' % (
+                        _logger.info('Resize: %s [max: %s]' % (
                             filename, max_px))
                     else:
 
-                        _logger.info('Redim (square): %s [max: %s]' % (
+                        _logger.info('Resize (square): %s [max: %s]' % (
                             filename, max_px))
 
                 except:
