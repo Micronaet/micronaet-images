@@ -38,6 +38,7 @@ from openerp.tools import (DEFAULT_SERVER_DATE_FORMAT,
     DATETIME_FORMATS_MAP,
     float_compare)
 import pdb
+import math
 
 _logger = logging.getLogger(__name__)
 
@@ -94,6 +95,10 @@ class ProductImageAlbum(orm.Model):
             'Force reload',
             help='''Force reload will regenerate all images
                 (used when change dimension etc.)'''),
+        'square_image': fields.boolean(
+            'Immagine quadrata',
+            help='Aggiunge delle bande bianche per tenere l\'immagine '
+                 'quadrata'),
         }
 
     _defaults = {
@@ -112,16 +117,32 @@ class ProductImageFile(orm.Model):
     # -----------------
     # Utility function:
     # -----------------
-    # def get_album_product_image(self, cr, uid, album_id, product_id,
-    #        context=None):
-    #    ''' Read and return image in album for product passed
-    #    '''
-    #    product_ids = self.search(cr, uid, [
-    #        ('album_id', '=', album_id),
-    #        ('product_id', '=', product_id),
-    #        ], context=context)
-    #
-    #    return True
+    def change_image_in_square(self, fullname):
+        """ Change image in square with adding 2 band
+        """
+        # Center the image:
+        image = Image.open(fullname)
+        old_width, old_height = image.size
+        if old_width > old_height:
+            new_width = new_height = old_width
+        else:
+            new_width = new_height = old_height
+        x1 = int(math.floor((new_width - old_width) / 2))
+        y1 = int(math.floor((new_height - old_height) / 2))
+
+        # Get fill in colour:
+        mode = image.mode
+        if len(mode) == 4:  # RGBA, CMYK
+            new_background = (255, 255, 255, 255)
+        elif len(mode) == 3:  # RGB
+            new_background = (255, 255, 255)
+        else:  # len(mode) == 1:  # L, 1
+            new_background = (255,)
+
+        new_image = Image.new(mode, (new_width, new_height), new_background)
+        new_image.paste(image, (x1, y1, x1 + old_width, y1 + old_height))
+        del(image)
+        new_image.save(fullname)
 
     def get_default_code(self, filename):
         """ Function that extract default_code from filename)
@@ -162,7 +183,7 @@ class ProductImageFile(orm.Model):
         forced_album_ids = []  # forced album list
         for album in album_pool.browse(cr, uid, album_ids, context=context):
             _logger.info('Updating resized album: %s' % album.name)
-                    
+
             # Load file name for check write / create operations:
             album_filename = {}  # reset every album
             for image in album.image_ids:
@@ -170,6 +191,7 @@ class ProductImageFile(orm.Model):
 
             origin = album.album_id  # readability
             redimension_type = album.redimension_type  # XXX max for now
+            square_image = album.square_image
 
             # TODO for now used max
             if redimension_type != 'max':
@@ -214,7 +236,16 @@ class ProductImageFile(orm.Model):
 
                     # Filters: NEAREST BILINEAR BICUBIC ANTIALIAS
                     new_img.save(file_out, 'JPEG')  # TODO change output!!!!
-                    _logger.info('Redim: %s [max: %s]' % (filename, max_px))
+
+                    if square_image:
+                        self.change_image_in_square(file_out)
+                        _logger.info('Redim: %s [max: %s]' % (
+                            filename, max_px))
+                    else:
+
+                        _logger.info('Redim (square): %s [max: %s]' % (
+                            filename, max_px))
+
                 except:
                     _logger.error(
                         'Cannot create thumbnail %s (jump image)' % file_in)
@@ -267,7 +298,7 @@ class ProductImageFile(orm.Model):
         exist_ids = [] # for all albums
         for album in album_pool.browse(cr, uid, album_ids, context=context):
             _logger.info('Loading album: %s' % album.name)
-            
+
             # Parameters:
             path = os.path.expanduser(album.path)
             extension_image = album.extension_image

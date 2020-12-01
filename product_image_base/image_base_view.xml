@@ -6,16 +6,16 @@
         <field name="name">product.image.file.search</field>
         <field name="model">product.image.file</field>
         <field name="arch" type="xml">
-            <search string="Image file" version="7.0">        
+            <search string="Image file" version="7.0">
                 <field name="album_id" filter_domain="[('album_id','=',self)]"/>
                 <field name="product_id" filter_domain="[('product_id','=',self)]"/>
                 <field name="filename" />
                 <field name="extension" />
                 <field name="variant_code" />
-                
+
                 <filter name="variant_on" string="Variant" domain="[('variant','=',True)]" />
                 <filter name="variant_off" string="Original" domain="[('variant','=',False)]" />
-                
+
                 <filter name="status_ok" string="OK" domain="[('status','=','ok')]" />
                 <filter name="status_modify" string="Modified" domain="[('status','=','modify')]" />
                 <filter name="status_removed" string="Removed" domain="[('status','=','removed')]" />
@@ -26,10 +26,10 @@
                     <filter name="group_product" string="Product" context="{'group_by': 'product_id'}"/>
                     <filter name="group_variant" string="Variant" context="{'group_by': 'variant'}"/>
                     <filter name="group_status" string="Status" context="{'group_by': 'status'}"/>
-                </group>                
+                </group>
             </search>
         </field>
-    </record>    
+    </record>
     <record id="product_product_image_file_tree_view" model="ir.ui.view">
         <field name="name">Image file</field>
         <field name="model">product.image.file</field>
@@ -43,7 +43,7 @@
                 <field name="variant" />
                 <field name="variant_code" />
                 <field name="height" />
-                <field name="width" />                
+                <field name="width" />
                 <field name="status" />
             </tree>
         </field>
@@ -62,7 +62,7 @@
                 <field name="variant" readonly="1" />
                 <field name="variant_code" readonly="1" />
                 <field name="height" readonly="1" />
-                <field name="width" readonly="1" />                
+                <field name="width" readonly="1" />
                 <field name="status" readonly="1" />
             </tree>
         </field>
@@ -87,7 +87,7 @@
                         <field name="variant_code" />
 
                         <field name="height" />
-                        <field name="width" />                
+                        <field name="width" />
                     </group>
                 </sheet>
             </form>
@@ -96,8 +96,8 @@
     <record id="product_product_image_file_action" model="ir.actions.act_window">
         <field name="name">Image file</field>
         <field name="res_model">product.image.file</field>
-        <field name="view_type">form</field>        
-        <field name="view_mode">tree,form</field>        
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
         <field name="view_id" ref="product_product_image_file_tree_readonly_view" />
         <field name="help">Images file</field>
     </record>
@@ -107,7 +107,7 @@
         <field name="name">Image album</field>
         <field name="model">product.image.album</field>
         <field name="arch" type="xml">
-            <tree string="Image album" colors="grey:schedule_load==False;blue:calculated==True">            
+            <tree string="Image album" colors="grey:schedule_load==False;blue:calculated==True">
                 <field name="schedule_load" />
                 <field name="code" />
                 <field name="name" />
@@ -136,7 +136,7 @@
 
                         <field name="code" />
                         <field name="name" />
-                        
+
                         <field name="path" />
                         <field name="extension_image" />
 
@@ -157,19 +157,20 @@
                                     <button name="clean_not_present" string="Clean album" type="object" icon="gtk-clear" confirm="Image no more found will be removed from this album list"/>
                                     <newline />
                                     <field name="image_ids" nolabel="1" readonly="1" context="{'embedded_form':True}"/>
-                                </group>    
+                                </group>
                            </page>
                             <page string="Calculated" attrs="{'invisible':[('calculated','=',False)]}">
                                 <group colspan="4" col="4">
                                     <field name="album_id" string="Origin" attrs="{'required':[('calculated','=',True)]}" domain="[('id','!=',active_id)]"/>
                                     <field name="force_reload" />
+                                    <field name="square_image" />
                                     <field name="redimension_type" attrs="{'required':[('calculated','=',True)]}" />
                                     <field name="height" attrs="{'required':[('calculated','=',True),('redimension_type','=','length')]}" />
                                     <field name="width" attrs="{'required':[('calculated','=',True),('redimension_type','=','width')]}" />
                                     <field name="max_px" attrs="{'required':[('calculated','=',True),('redimension_type','=','max')]}" />
                                 </group>
                            </page>
-                        </notebook>                   
+                        </notebook>
                     </group>
                 </sheet>
             </form>
@@ -179,25 +180,25 @@
     <record id="product_product_image_album_action" model="ir.actions.act_window">
         <field name="name">Image album</field>
         <field name="res_model">product.image.album</field>
-        <field name="view_type">form</field>        
-        <field name="view_mode">tree,form</field>        
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
         <field name="help">Folder where are stored images</field>
     </record>
- 
+
     <!--product.product-->
     <record model="ir.ui.view" id="view_product_product_chec_search">
         <field name="name">product.product.check.image.tree</field>
         <field name="model">product.product</field>
         <field name="arch" type="xml">
-            <search string="Product image search" version="7.0">        
+            <search string="Product image search" version="7.0">
                 <field name="name" />
                 <field name="default_code" />
 
                 <!--<field name="name" filter_domain="[('partner_id','=',self)]"/>TODO family_id-->
-                
+
                 <filter name="no_ean" string="No EAN" domain="[('ean13','=',False)]"/>
-                <filter name="no_code" string="No code" domain="[('default_code','=',False)]"/>                    
-                
+                <filter name="no_code" string="No code" domain="[('default_code','=',False)]"/>
+
                 <!--<group expand="0" string="Group By">
                     <filter string="UOM" name="group_uom" context="{'group_by': 'uom_id'}" />
                     <filter string="Category" name="group_categ" context="{'group_by': 'categ_id'}" />
@@ -218,31 +219,31 @@
                 <field name="width" />
                 <field name="length" />-->
                 <!--<field name="statistic_category" />-->
-                <field name="album_ids" widget="many2many_tags"/>                
+                <field name="album_ids" widget="many2many_tags"/>
             </tree>
         </field>
     </record>
     <record id="product_product_check_image_action" model="ir.actions.act_window">
         <field name="name">Product check image</field>
         <field name="res_model">product.product</field>
-        <field name="view_type">form</field>        
-        <field name="view_mode">tree,form</field>        
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
         <field name="view_id" ref="view_product_product_check_tree"/>
         <field name="search_view_id" ref="view_product_product_chec_search"/>
         <field name="help">Product with images</field>
     </record>
-    
-    <menuitem action="product_product_image_album_action" 
-              id="product_product_image_album_action_menu" 
-              parent="base.menu_product" 
-              sequence="50" /> 
-        <menuitem action="product_product_image_file_action" 
-                  id="product_product_image_file_action_menu" 
-                  parent="product_product_image_album_action_menu" 
+
+    <menuitem action="product_product_image_album_action"
+              id="product_product_image_album_action_menu"
+              parent="base.menu_product"
+              sequence="50" />
+        <menuitem action="product_product_image_file_action"
+                  id="product_product_image_file_action_menu"
+                  parent="product_product_image_album_action_menu"
                   sequence="10" />
-        <menuitem action="product_product_check_image_action" 
-                  id="product_product_check_image_file_menu" 
-                  parent="product_product_image_album_action_menu" 
+        <menuitem action="product_product_check_image_action"
+                  id="product_product_check_image_file_menu"
+                  parent="product_product_image_album_action_menu"
                   sequence="20" />
     </data>
 </openerp>
