@@ -1,5 +1,6 @@
 import os
 import base64
+import pdb
 import sys
 
 from PIL import Image
@@ -53,7 +54,7 @@ def change_image_in_square(fullname):
     del image
     new_image.save(fullname)
 
-
+pdb.set_trace()
 for root, folders, files in os.walk(origin_path):
     for filename in files:
         file_in = os.path.join(root, filename)
