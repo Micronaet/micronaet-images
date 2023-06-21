@@ -82,51 +82,51 @@ def change_image_in_square(fullname):
     del image
     new_image.save(fullname)
 
+try:
+    for root, folders, files in os.walk(origin_path):
+        for filename in files:
+            file_in = os.path.join(root, filename)
+            file_out = os.path.join(destination_path, filename)
 
-for root, folders, files in os.walk(origin_path):
-    for filename in files:
-        file_in = os.path.join(root, filename)
-        file_out = os.path.join(destination_path, filename)
+            if file_in not in files_resized:
+                files_resized[file_in] = os.path.getmtime(file_in)
 
-        if file_in not in files_resized:
-            files_resized[file_in] = os.path.getmtime(file_in)
-
-        if files_resized[file_in] == os.path.getmtime(file_in):
-            print('[WARNING] Nessuna modifica: %s (saltato)' % file_in)
-            continue
-
-        try:
-            try:
-                img = Image.open(file_in)
-            except:
-                print('[ERROR] Apertura file: %s (saltato)' % file_in)
+            if files_resized[file_in] == os.path.getmtime(file_in):
+                print('[WARNING] Nessuna modifica: %s (saltato)' % file_in)
                 continue
 
-            width, height = img.size
+            try:
+                try:
+                    img = Image.open(file_in)
+                except:
+                    print('[ERROR] Apertura file: %s (saltato)' % file_in)
+                    continue
 
-            if width > height:
-                new_width = max_px
-                new_height = max_px * height / width
-            else:
-                new_height = max_px
-                new_width = max_px * width / height
+                width, height = img.size
 
-            new_img = img.resize(
-                (new_width, new_height),
-                Image.ANTIALIAS)
+                if width > height:
+                    new_width = max_px
+                    new_height = max_px * height / width
+                else:
+                    new_height = max_px
+                    new_width = max_px * width / height
 
-            # Filters: NEAREST BILINEAR BICUBIC ANTIALIAS
-            new_img.save(file_out, 'JPEG')  # todo change output!!!!
+                new_img = img.resize(
+                    (new_width, new_height),
+                    Image.ANTIALIAS)
 
-            if square_image:
-                change_image_in_square(file_out)
-                print('[INFO]Resize: %s [max: %s]' % (filename, max_px))
-            else:
-                print('[INFO]Resize (square): %s [max: %s]' % (
-                    filename, max_px))
-        except:
-            print('[ERROR] Error resizing: %s\n%s' % (filename, sys.exit()))
-    break
+                # Filters: NEAREST BILINEAR BICUBIC ANTIALIAS
+                new_img.save(file_out, 'JPEG')  # todo change output!!!!
 
-pickle.dump(files_resized, open(pickle_file, 'wb'))
-print('[INFO] Ridimensionamento terminato')
+                if square_image:
+                    change_image_in_square(file_out)
+                    print('[INFO]Resize: %s [max: %s]' % (filename, max_px))
+                else:
+                    print('[INFO]Resize (square): %s [max: %s]' % (
+                        filename, max_px))
+            except:
+                print('[ERROR] Error resizing: %s\n%s' % (filename, sys.exit()))
+        break
+finally:
+    pickle.dump(files_resized, open(pickle_file, 'wb'))
+    print('[INFO] Ridimensionamento terminato')
