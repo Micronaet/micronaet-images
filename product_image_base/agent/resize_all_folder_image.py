@@ -102,7 +102,6 @@ for root, folders, files in os.walk(origin_path):
                 print('[ERROR] Apertura file: %s (saltato)' % file_in)
                 continue
 
-            pdb.set_trace()
             width, height = img.size
 
             if width > height:
