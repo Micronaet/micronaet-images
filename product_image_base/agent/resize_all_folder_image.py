@@ -23,6 +23,7 @@ import os
 import pdb
 import sys
 import math
+import pickle
 from PIL import Image
 import ConfigParser
 
@@ -42,6 +43,13 @@ max_width = eval(config.get('SETUP', 'max_width'))
 max_height = eval(config.get('SETUP', 'max_height'))
 max_px = eval(config.get('SETUP', 'max_px'))
 square_image = eval(config.get('SETUP', 'square_image'))
+
+pickle_file = './loaded.pickle'
+
+try:
+    files_resized = pickle.load(open(pickle_file, 'rb'))
+except:
+    files_resized = {}
 
 
 # -----------------------------------------------------------------------------
@@ -80,11 +88,18 @@ for root, folders, files in os.walk(origin_path):
         file_in = os.path.join(root, filename)
         file_out = os.path.join(destination_path, filename)
 
+        if file_in not in files_resized:
+            files_resized[file_in] = os.path.getmtime(file_in)
+
+        if files_resized[file_in] == os.path.getmtime(file_in):
+            print('[WARNING] Nessuna modifica: %s (saltato)' % file_in)
+            continue
+
         try:
             try:
                 img = Image.open(file_in)
             except:
-                print('Errore aprendo il file: %s (saltato)' % file_in)
+                print('[ERROR] Apertura file: %s (saltato)' % file_in)
                 continue
 
             pdb.set_trace()
@@ -106,11 +121,13 @@ for root, folders, files in os.walk(origin_path):
 
             if square_image:
                 change_image_in_square(file_out)
-                print('Resize: %s [max: %s]' % (filename, max_px))
+                print('[INFO]Resize: %s [max: %s]' % (filename, max_px))
             else:
-                print('Resize (square): %s [max: %s]' % (filename, max_px))
+                print('[INFO]Resize (square): %s [max: %s]' % (
+                    filename, max_px))
         except:
-            print('Error resizing: %s\n%s' % (filename, sys.exit()))
+            print('[ERROR] Error resizing: %s\n%s' % (filename, sys.exit()))
     break
 
-print('Ridimensionamento terminato')
+pickle.dump(files_resized, open(pickle_file, 'wb'))
+print('[INFO] Ridimensionamento terminato')
