@@ -82,7 +82,10 @@ for root, folders, files in os.walk(origin_path):
         file_out = os.path.join(destination_path, filename)
 
         try:
-            img = Image.open(file_in)
+            try:
+                img = Image.open(file_in)
+            except:
+                print('Errore aprendo il file: %s' % file_in)
             width, height = img.size
 
             if width > height:
