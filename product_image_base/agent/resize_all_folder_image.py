@@ -107,3 +107,5 @@ for root, folders, files in os.path.walk(origin_path):
         except:
             print('Error resizing: %s\n%s' % (filename, sys.exit()))
     break
+
+print('Ridimensionamento terminato')
