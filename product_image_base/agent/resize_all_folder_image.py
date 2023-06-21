@@ -75,7 +75,6 @@ def change_image_in_square(fullname):
     new_image.save(fullname)
 
 
-pdb.set_trace()
 for root, folders, files in os.walk(origin_path):
     for filename in files:
         file_in = os.path.join(root, filename)
@@ -88,6 +87,7 @@ for root, folders, files in os.walk(origin_path):
                 print('Errore aprendo il file: %s (saltato)' % file_in)
                 continue
 
+            pdb.set_trace()
             width, height = img.size
 
             if width > height:
