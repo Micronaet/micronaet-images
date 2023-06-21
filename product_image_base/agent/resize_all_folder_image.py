@@ -36,8 +36,8 @@ config = ConfigParser.ConfigParser()
 config.read([cfg_file])
 
 # Parameters
-origin_path = config.get('SETUP', 'origin')
-destination_path = config.get('SETUP', 'destination')
+origin_path = os.path.expanduser(config.get('SETUP', 'origin'))
+destination_path = os.path.expanduser(config.get('SETUP', 'destination'))
 max_width = eval(config.get('SETUP', 'max_width'))
 max_height = eval(config.get('SETUP', 'max_height'))
 max_px = eval(config.get('SETUP', 'max_px'))
