@@ -86,6 +86,8 @@ for root, folders, files in os.walk(origin_path):
                 img = Image.open(file_in)
             except:
                 print('Errore aprendo il file: %s' % file_in)
+                continue
+
             width, height = img.size
 
             if width > height:
