@@ -82,16 +82,15 @@ def change_image_in_square(fullname):
     del image
     new_image.save(fullname)
 
+pdb.set_trace()
 try:
     for root, folders, files in os.walk(origin_path):
         for filename in files:
             file_in = os.path.join(root, filename)
             file_out = os.path.join(destination_path, filename)
 
-            if file_in not in files_resized:
-                files_resized[file_in] = os.path.getmtime(file_in)
-
-            if files_resized[file_in] == os.path.getmtime(file_in):
+            timestamp = os.path.getmtime(file_in)
+            if files_resized.get(file_in) == os.path.getmtime(file_in):
                 print('[WARNING] Nessuna modifica: %s (saltato)' % file_in)
                 continue
 
@@ -124,6 +123,8 @@ try:
                 else:
                     print('[INFO]Resize (square): %s [max: %s]' % (
                         filename, max_px))
+
+                files_resized[file_in] = timestamp
             except:
                 print('[ERROR] Error resizing: %s\n%s' % (filename, sys.exit()))
         break
