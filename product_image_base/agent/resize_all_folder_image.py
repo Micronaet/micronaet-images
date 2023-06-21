@@ -76,7 +76,7 @@ def change_image_in_square(fullname):
 
 
 pdb.set_trace()
-for root, folders, files in os.path.walk(origin_path):
+for root, folders, files in os.walk(origin_path):
     for filename in files:
         file_in = os.path.join(root, filename)
         file_out = os.path.join(destination_path, filename)
