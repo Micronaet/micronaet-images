@@ -128,5 +128,6 @@ try:
                 print('[ERROR] Error resizing: %s\n%s' % (filename, sys.exit()))
         break
 finally:
+    print('[INFO] Picke file saved: %s' % pickle_file)
     pickle.dump(files_resized, open(pickle_file, 'wb'))
     print('[INFO] Ridimensionamento terminato')
