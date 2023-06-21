@@ -28,7 +28,7 @@ for root, folders, files in os.walk('.'):
             file_d = '%s.%s' % (
                 file_o[:-8],
                 file_o[-7:],
-                
+
                 )
             full_o = os.path.join(root, file_o)
             full_d = os.path.join(root, file_d)
@@ -37,10 +37,8 @@ for root, folders, files in os.walk('.'):
                 file_d,
                 ))
             ren_list.append((full_o, full_d))
-        else:    
+        else:
             log_f.write('%s | JUMPED\n' % file_o)
-            
+
 for full_o, full_d in ren_list:
     os.rename(full_o, full_d)
-             
-# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

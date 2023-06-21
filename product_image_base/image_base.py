@@ -421,8 +421,8 @@ class ProductImageFile(orm.Model):
 
         # Set all images as ok not modify (except error convert):
         modify_ids = self.search(cr, uid, [
-            ('status', '=', 'modify'), # only modify files
-            ('id', 'not in', not_updated_ids), # only files right converted
+            ('status', '=', 'modify'),  # only modify files
+            ('id', 'not in', not_updated_ids),  # only files right converted
             ], context=context)
         if modify_ids:
             self.write(cr, uid, modify_ids, {
