@@ -38,10 +38,10 @@ config.read([cfg_file])
 # Parameters
 origin_path = config.get('SETUP', 'origin')
 destination_path = config.get('SETUP', 'destination')
-max_width = config.get('SETUP', 'max_width')
-max_height = config.get('SETUP', 'max_height')
-max_px = config.get('SETUP', 'max_px')
-square_image = config.get('SETUP', 'square_image')
+max_width = eval(config.get('SETUP', 'max_width'))
+max_height = eval(config.get('SETUP', 'max_height'))
+max_px = eval(config.get('SETUP', 'max_px'))
+square_image = eval(config.get('SETUP', 'square_image'))
 
 
 # -----------------------------------------------------------------------------
