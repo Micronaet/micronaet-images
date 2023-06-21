@@ -85,7 +85,7 @@ for root, folders, files in os.walk(origin_path):
             try:
                 img = Image.open(file_in)
             except:
-                print('Errore aprendo il file: %s' % file_in)
+                print('Errore aprendo il file: %s (saltato)' % file_in)
                 continue
 
             width, height = img.size
