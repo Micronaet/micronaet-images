@@ -373,6 +373,7 @@ class ProductImageFile(orm.Model):
                             cr, uid, data, context=context)
                     # if item_id:
                     exist_ids.append(item_id) # after will force exist
+                break    
 
         # Mark image no more present (for all albums):
         not_exist_ids = self.search(cr, uid, [
